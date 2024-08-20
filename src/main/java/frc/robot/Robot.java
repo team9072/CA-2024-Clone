@@ -13,14 +13,11 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.autonomous.AutoChooser;
 import frc.robot.autonomous.AutoRunner;
 import frc.robot.autonomous.tasks.Task;
@@ -49,10 +46,6 @@ public class Robot extends LoggedRobot {
   // Controller
   private final DriverController m_driverController = new DriverController(0, true, true);
   private final OperatorController m_operatorController = new OperatorController(1, true, true);
-  private final GenericHID sysIdController = new GenericHID(2);
-
-  private final SlewRateLimiter m_speedLimiter = new SlewRateLimiter(Drivetrain.kMaxAcceleration);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(Math.PI * 8);
 
   // Robot subsystems
   private List<Subsystem> m_allSubsystems = new ArrayList<>();
@@ -143,21 +136,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // Get the x speed. We are inverting this because Xbox controllers return
-    // negative values when we push forward.
-    double maxSpeed = m_driverController.getWantsSpeedMode() ? Drivetrain.kMaxBoostSpeed : Drivetrain.kMaxSpeed;
-    double xSpeed = m_speedLimiter.calculate(m_driverController.getForwardAxis() * maxSpeed);
-
-    // Get the rate of angular rotation. We are inverting this because we want a
-    // positive value when we pull to the left (remember, CCW is positive in
-    // mathematics). Xbox controllers return positive values when you pull to
-    // the right by default.
-
-    // m_drive.slowMode(m_driverController.getWantsSlowMode());
-    // m_drive.speedMode(m_driverController.getWantsSpeedMode());
-    double rot = m_rotLimiter.calculate(m_driverController.getTurnAxis() * Drivetrain.kMaxAngularSpeed);
-
-    m_drive.drive(xSpeed, rot);
+    m_drive.drive(m_driverController.getForwardAxis(), m_driverController.getLeftAxis(), m_driverController.getTurnAxis(), false, true);
 
     // Shooter variable speed
     if (m_driverController.getWantsMoreSpeed() || m_operatorController.getWantsMoreSpeed()) {
@@ -234,7 +213,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testPeriodic() {
-    if (sysIdController.getRawButtonPressed(1)) {
+    /*if (sysIdController.getRawButtonPressed(1)) {
       // A
       m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward).schedule();
     } else if (sysIdController.getRawButtonPressed(2)) {
@@ -248,7 +227,7 @@ public class Robot extends LoggedRobot {
       m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse).schedule();
     } else if (sysIdController.getRawButtonPressed(8)) {
       CommandScheduler.getInstance().cancelAll();
-    }
+    }*/
   }
 
   @Override

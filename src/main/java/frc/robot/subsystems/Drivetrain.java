@@ -4,390 +4,461 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
-import java.util.function.BooleanSupplier;
-
-import org.littletonrobotics.junction.AutoLogOutput;
-
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.ReplanningConfig;
-import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
-import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.math.numbers.N2;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.Constants;
-import frc.robot.simulation.Field;
-import frc.robot.simulation.SimulatableCANSparkMax;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.util.WPIUtilJNI;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.I2C;
+import frc.robot.Constants.DriveConstants;
+import frc.utils.SwerveUtils;
 
 public class Drivetrain extends Subsystem {
-  // 1 meters per second.
-  public static final double kMaxSpeed = 2.0;
-  public static final double kMaxBoostSpeed = 4.0;
+  // Create MAXSwerveModules
+  private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
+      DriveConstants.kFrontLeftDrivingCanId,
+      DriveConstants.kFrontLeftTurningCanId,
+      DriveConstants.kFrontLeftChassisAngularOffset);
 
-  // 3 meters per second.
-  public static final double kMaxAcceleration = 8.0;
+  private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+      DriveConstants.kFrontRightDrivingCanId,
+      DriveConstants.kFrontRightTurningCanId,
+      DriveConstants.kFrontRightChassisAngularOffset);
 
-  // 0.7 rotations per second.
-  public static final double kMaxAngularSpeed = Math.PI * 1.0;
+  private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+      DriveConstants.kRearLeftDrivingCanId,
+      DriveConstants.kRearLeftTurningCanId,
+      DriveConstants.kBackLeftChassisAngularOffset);
 
-  private static final double kSlowModeRotScale = 0.1;
-  private static final double kSpeedModeScale = 2.0;
-  private static final double kTrackWidth = Units.inchesToMeters(22.0);
-  private static final double kWheelRadius = Units.inchesToMeters(3.0);
-  private static final double kGearRatio = 10.71;
-  private static final double kMetersPerRev = (2.0 * Math.PI * kWheelRadius) / kGearRatio;
+  private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+      DriveConstants.kRearRightDrivingCanId,
+      DriveConstants.kRearRightTurningCanId,
+      DriveConstants.kBackRightChassisAngularOffset);
 
-  private final SimulatableCANSparkMax mLeftLeader = new SimulatableCANSparkMax(Constants.Drive.kFLMotorId,
-      MotorType.kBrushless);
-  private final SimulatableCANSparkMax mLeftFollower = new SimulatableCANSparkMax(Constants.Drive.kBLMotorId,
-      MotorType.kBrushless);
-  private final SimulatableCANSparkMax mRightLeader = new SimulatableCANSparkMax(Constants.Drive.kFRMotorId,
-      MotorType.kBrushless);
-  private final SimulatableCANSparkMax mRightFollower = new SimulatableCANSparkMax(Constants.Drive.kBRMotorId,
-      MotorType.kBrushless);
+  // The gyro sensor
+  private final AHRS m_gyro = new AHRS(I2C.Port.kMXP);
 
-  private final MotorControllerGroup mLeftGroup = new MotorControllerGroup(mLeftLeader, mLeftFollower);
-  private final MotorControllerGroup mRightGroup = new MotorControllerGroup(mRightLeader, mRightFollower);
+  // Slew rate filter variables for controlling lateral acceleration
+  private double m_currentRotation = 0.0;
+  private double m_currentTranslationDir = 0.0;
+  private double m_currentTranslationMag = 0.0;
 
-  private final RelativeEncoder mLeftEncoder;
-  private final RelativeEncoder mRightEncoder;
+  private SlewRateLimiter m_magLimiter = new SlewRateLimiter(DriveConstants.kMagnitudeSlewRate);
+  private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
+  private double m_prevTime = WPIUtilJNI.now() * 1e-6;
 
-  private final PIDController mLeftPIDController = new PIDController(Constants.Drive.kP, Constants.Drive.kI,
-      Constants.Drive.kD);
-  private final PIDController mRightPIDController = new PIDController(Constants.Drive.kP, Constants.Drive.kI,
-      Constants.Drive.kD);
+  // Odometry class for tracking robot pose
+  private final SwerveDrivePoseEstimator m_odometry = new SwerveDrivePoseEstimator(
+      DriveConstants.kDriveKinematics,
+      getHeadingOdometry(),
+      getModulePositions(),
+      new Pose2d());
 
-  private final AHRS mGyro = new AHRS();
+  private final ProfiledPIDController m_rotationPID;
 
-  private final DifferentialDriveKinematics mKinematics = new DifferentialDriveKinematics(kTrackWidth);
-
-  private final DifferentialDriveOdometry mOdometry;
-
-  private final SimpleMotorFeedforward mLeftFeedforward = new SimpleMotorFeedforward(Constants.Drive.kS,
-      Constants.Drive.kV);
-  private final SimpleMotorFeedforward mRightFeedforward = new SimpleMotorFeedforward(Constants.Drive.kS,
-      Constants.Drive.kV);
-
-  /*********
-   * SysId *
-   *********/
-
-  // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
-  // Mutable holder for unit-safe linear distance values, persisted to avoid
-  // reallocation.
-  private final MutableMeasure<Distance> m_distance = mutable(Meters.of(0));
-  // Mutable holder for unit-safe linear velocity values, persisted to avoid
-  // reallocation.
-  private final MutableMeasure<Velocity<Distance>> m_velocity = mutable(MetersPerSecond.of(0));
-
-  private final SysIdRoutine mSysIdRoutine;
-
-  // Simulation classes help us simulate our robot
-  // private final AnalogGyroSim mGyroSim = new AnalogGyroSim(mgyro);
-  // private final EncoderSim mLeftEncoderSim = new EncoderSim(mleftEncoder);
-  // private final EncoderSim mRightEncoderSim = new EncoderSim(mrightEncoder);
-  private final Field m_field = Field.getInstance();
-  private final LinearSystem<N2, N2, N2> mDrivetrainSystem = LinearSystemId.identifyDrivetrainSystem(1.98, 0.2, 1.5,
-      0.3);
-  private final DifferentialDrivetrainSim mDrivetrainSimulator = new DifferentialDrivetrainSim(
-      mDrivetrainSystem, DCMotor.getCIM(2), kGearRatio, kTrackWidth, kWheelRadius, null);
-
-  private static Drivetrain mInstance;
-  private static PeriodicIO mPeriodicIO;
+  private static Drivetrain m_instance;
+  private SwerveModuleState[] m_periodicStates;
 
   public static Drivetrain getInstance() {
-    if (mInstance == null) {
-      mInstance = new Drivetrain();
+    if (m_instance == null) {
+      m_instance = new Drivetrain();
     }
-    return mInstance;
+    return m_instance;
   }
 
+  /** Creates a new DriveSubsystem. */
   public Drivetrain() {
     super("Drivetrain");
 
-    mGyro.reset();
-
-    mLeftLeader.restoreFactoryDefaults();
-    mLeftLeader.setIdleMode(IdleMode.kCoast);
-    mLeftFollower.restoreFactoryDefaults();
-    mLeftFollower.setIdleMode(IdleMode.kCoast);
-    mRightLeader.restoreFactoryDefaults();
-    mRightLeader.setIdleMode(IdleMode.kCoast);
-    mRightFollower.restoreFactoryDefaults();
-    mRightFollower.setIdleMode(IdleMode.kCoast);
-
-    // We need to invert one side of the drivetrain so that positive voltages
-    // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
-    mRightGroup.setInverted(true);
-
-    mLeftEncoder = mLeftLeader.getEncoder();
-    mRightEncoder = mRightLeader.getEncoder();
-
-    // The "native units" for the SparkMax is motor rotations:
-    // Conversion factor = (distance traveled per motor shaft rotation)
-    mLeftEncoder.setPositionConversionFactor(kMetersPerRev);
-    mRightEncoder.setPositionConversionFactor(kMetersPerRev);
-    // The "native units" for the SparkMax is RPM:
-    // Conversion factor = (distance traveled per motor shaft rotation) / (60
-    // seconds)
-    mLeftEncoder.setVelocityConversionFactor(kMetersPerRev / 60);
-    mRightEncoder.setVelocityConversionFactor(kMetersPerRev / 60);
-
-    mLeftEncoder.setPosition(0.0);
-    mRightEncoder.setPosition(0.0);
-
-    mOdometry = new DifferentialDriveOdometry(mGyro.getRotation2d(),
-        mLeftEncoder.getPosition(), mRightEncoder.getPosition());
-
-    mPeriodicIO = new PeriodicIO();
-
-    // Configure AutoBuilder last
-    AutoBuilder.configureRamsete(
+    // Reset and calibrate
+    resetGyro();
+    
+    // m_gyro.setAngleAdjustment(180);
+    AutoBuilder.configureHolonomic(
         this::getPose, // Robot pose supplier
         this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
-        this::getCurrentSpeeds, // Current ChassisSpeeds supplier
-        this::drive, // Method that will drive the robot given ChassisSpeeds
-        new ReplanningConfig(), // Default path replanning config. See the API for the options here
-        new BooleanSupplier() {
-          @Override
-          public boolean getAsBoolean() {
-            return true;
+        this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+        this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+        DriveConstants.AutoPathFollowerConfig,
+        () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red
+          // alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
           }
-        }, // determines if paths should be flipped to the other side of the field
+          return false;
+        },
         this // Reference to this subsystem to set requirements
     );
 
-    mSysIdRoutine = new SysIdRoutine(
-        // Empty config defaults to 1 volt/second ramp rate and 7 volt step voltage.
-        new SysIdRoutine.Config(),
-        new SysIdRoutine.Mechanism(
-            // Tell SysId how to plumb the driving voltage to the motors.
-            (Measure<Voltage> volts) -> {
-              // System.out.println("OPE:" + volts);
-              mLeftGroup.setVoltage(volts.in(Volts));
-              mRightGroup.setVoltage(volts.in(Volts));
-            },
-            // Tell SysId how to record a frame of data for each motor on the mechanism
-            // being characterized.
-            log -> {
-              // Record a frame for the left motors. Since these share an encoder, we consider
-              // the entire group to be one motor.
-              log.motor("drive-left")
-                  .voltage(m_appliedVoltage.mut_replace(
-                      mLeftLeader.getAppliedOutput() * RobotController.getBatteryVoltage(), Volts))
-                  .linearPosition(m_distance.mut_replace(mLeftEncoder.getPosition(), Meters))
-                  .linearVelocity(
-                      m_velocity.mut_replace(mLeftEncoder.getVelocity(), MetersPerSecond));
-              // Record a frame for the right motors. Since these share an encoder, we
-              // consider the entire group to be one motor.
-              log.motor("drive-right")
-                  .voltage(m_appliedVoltage.mut_replace(
-                      -mRightLeader.getAppliedOutput() * RobotController
-                          .getBatteryVoltage(),
-                      Volts))
-                  .linearPosition(m_distance.mut_replace(-mRightEncoder.getPosition(), Meters))
-                  .linearVelocity(
-                      m_velocity.mut_replace(-mRightEncoder.getVelocity(), MetersPerSecond));
-            },
-            // Tell SysId to make generated commands require this subsystem, suffix test
-            // state in WPILog with this subsystem's name ("drive")
-            this));
+    m_rotationPID = new ProfiledPIDController(
+        DriveConstants.kRotationPID.kP, DriveConstants.kRotationPID.kI, DriveConstants.kRotationPID.kD,
+        new TrapezoidProfile.Constraints(
+            DriveConstants.kAutoAimMaxAngularSpeed,
+            DriveConstants.kAutoAimMaxAngularAccel),
+        0.02);
 
+    m_rotationPID.setIntegratorRange(-DriveConstants.kRotationPID.iZone, DriveConstants.kRotationPID.iZone);
+    m_rotationPID.enableContinuousInput(-Math.PI, Math.PI);
   }
 
-  private static class PeriodicIO {
-    DifferentialDriveWheelSpeeds diffWheelSpeeds = new DifferentialDriveWheelSpeeds(0.0, 0.0);
-    boolean slowMode = false;
-    boolean speedMode = false;
-    double leftVoltage = 0.0;
-    double rightVoltage = 0.0;
+  public void turnTo(double degrees) {
+    /*
+     * m_frontLeft.m_drivingPIDController.setReference(rot,
+     * CANSparkMax.ControlType.kPosition);
+     * m_frontRight.m_drivingPIDController.setReference(rot,
+     * CANSparkMax.ControlType.kPosition);
+     * m_rearLeft.m_drivingPIDController.setReference(rot,
+     * CANSparkMax.ControlType.kPosition);
+     * m_rearRight.m_drivingPIDController.setReference(rot,
+     * CANSparkMax.ControlType.kPosition);
+     */
   }
 
   /**
-   * Sets whether slow mode should be used
-   *
-   * @param slowMode Should slow mode be used
+   * Reset the forward direction of the robot
    */
-  public void slowMode(boolean slowMode) {
-    mPeriodicIO.slowMode = slowMode;
+  public void resetGyro() {
+    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+    Pose2d newPose = new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(alliance == Alliance.Blue ? 0 : 180));
+    resetOdometry(newPose);
   }
 
   /**
-   * Sets whether speed mode should be used
-   *
-   * @param speedMode Should speed mode be used
+   * Update the odometry with an estimation from the vision system
    */
-  public void speedMode(boolean speedMode) {
-    mPeriodicIO.speedMode = speedMode;
+  public void updateOdometryWithVision(Pose2d pose, double timestamp) {
+    m_odometry.addVisionMeasurement(pose, timestamp);
+  }
+
+  private void updateOdometry() {
+    // Update the odometry in the periodic block
+    m_odometry.update(
+        getHeadingOdometry(),
+        getModulePositions());
   }
 
   /**
-   * Controls the robot using arcade drive.
+   * Returns the currently-estimated pose of the robot.
    *
-   * @param xSpeed the speed for the x axis
-   * @param rot    the rotation
+   * @return The pose.
    */
-  public void drive(double xSpeed, double rot) {
-    if (mPeriodicIO.slowMode) {
-      mPeriodicIO.diffWheelSpeeds = mKinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0, rot * kSlowModeRotScale));
-    } else if (mPeriodicIO.speedMode) {
-      mPeriodicIO.diffWheelSpeeds = mKinematics
-          .toWheelSpeeds(new ChassisSpeeds(xSpeed * kSpeedModeScale, 0, rot * kSlowModeRotScale));
-    } else {
-      mPeriodicIO.diffWheelSpeeds = mKinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0, rot));
-    }
-  }
-
-  public void drive(ChassisSpeeds speeds) {
-    mPeriodicIO.diffWheelSpeeds = mKinematics.toWheelSpeeds(speeds);
-  }
-
-  public void clearTurnPIDAccumulation() {
-    mLeftPIDController.reset();
-    mRightPIDController.reset();
-  }
-
-  public void setGyroAngleAdjustment(double angle) {
-    mGyro.setAngleAdjustment(angle);
-  }
-
-  /** Update robot odometry. */
-  public void updateOdometry() {
-    mOdometry.update(mGyro.getRotation2d(), mLeftEncoder.getPosition(), -mRightEncoder.getPosition());
-  }
-
-  /** Resets robot odometry. */
-  public void resetOdometry(Pose2d pose) {
-    mLeftEncoder.setPosition(0.0);
-    mRightEncoder.setPosition(0.0);
-    mDrivetrainSimulator.setPose(pose);
-
-    mOdometry.resetPosition(
-        mGyro.getRotation2d(),
-        0.0,
-        0.0,
-        pose);
-  }
-
-  /** Check the current robot pose. */
-  @AutoLogOutput
   public Pose2d getPose() {
-    return mOdometry.getPoseMeters();
+    return m_odometry.getEstimatedPosition();
   }
 
-  public void setPose(Pose2d pose) {
-    mOdometry.resetPosition(
-        mGyro.getRotation2d(),
-        mLeftEncoder.getPosition(),
-        -mRightEncoder.getPosition(),
+  /**
+   * Resets the odometry to the specified pose.
+   *
+   * @param pose The pose to which to set the odometry.
+   */
+  public void resetOdometry(Pose2d pose) {
+    m_odometry.resetPosition(
+        getHeadingOdometry(),
+        getModulePositions(),
         pose);
   }
 
-  public ChassisSpeeds getCurrentSpeeds() {
-    DifferentialDriveWheelSpeeds wheelSpeeds = new DifferentialDriveWheelSpeeds(
-        mLeftEncoder.getVelocity(),
-        -mRightEncoder.getVelocity());
+  /**
+   * Method to drive the robot using joystick info.
+   *
+   * @param xSpeed        Speed of the robot in the x direction (forward).
+   * @param ySpeed        Speed of the robot in the y direction (sideways).
+   * @param rotSpeed      Angular rate of the robot.
+   * @param fieldRelative Whether the provided x and y speeds are relative to the
+   *                      field.
+   * @param rateLimit     Whether to enable rate limiting for smoother control.
+   */
+  public void drive(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative, boolean rateLimit) {
+    double xSpeedCommanded;
+    double ySpeedCommanded;
+    double rotSpeedCommanded;
 
-    return mKinematics.toChassisSpeeds(wheelSpeeds);
+    if (rateLimit) {
+      ChassisSpeeds limitedSpeeds = limitSlewRate(xSpeed, ySpeed, rotSpeed);
+
+      xSpeedCommanded = limitedSpeeds.vxMetersPerSecond;
+      ySpeedCommanded = limitedSpeeds.vyMetersPerSecond;
+      rotSpeedCommanded = limitedSpeeds.omegaRadiansPerSecond;
+    } else {
+      xSpeedCommanded = xSpeed;
+      ySpeedCommanded = ySpeed;
+      rotSpeedCommanded = rotSpeed;
+    }
+
+    // Convert the commanded speeds into the correct units for the drivetrain
+    double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
+    double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
+    double rotSpeedDelivered = rotSpeedCommanded * DriveConstants.kMaxAngularSpeed;
+
+    setSwerveSpeeds(xSpeedDelivered, ySpeedDelivered, rotSpeedDelivered, fieldRelative);
   }
 
-  /** Update our simulation. This should be run every robot loop in simulation. */
-  public void simulationPeriodic() {
-    // To update our simulation, we set motor voltage inputs, update the
-    // simulation, and write the simulated positions and velocities to our
-    // simulated encoder and gyro. We negate the right side so that positive
-    // voltages make the right side move forward.
-    mDrivetrainSimulator.setInputs(
-        mLeftGroup.get() * RobotController.getInputVoltage(),
-        mRightGroup.get() * RobotController.getInputVoltage());
-    mDrivetrainSimulator.update(0.02);
+  /**
+   * Method to drive the robot using joystick info.
+   *
+   * @param xSpeed         Speed of the robot in the x direction (forward).
+   * @param ySpeed         Speed of the robot in the y direction (sideways).
+   * @param targetRotation Rotation to set the robot to in radians
+   * @param fieldRelative  Whether the provided x and y speeds are relative to the
+   *                       field.
+   * @param rateLimit      Whether to enable rate limiting for smoother control.
+   */
+  public void driveWithHeading(double xSpeed, double ySpeed, Rotation2d targetRotation, boolean fieldRelative,
+      boolean rateLimit) {
+    double rotSpeed = m_rotationPID.calculate(
+        getHeading().getRadians(),
+        new TrapezoidProfile.State(targetRotation.getRadians(), 0));
 
-    // mLeftEncoderSim.setDistance(mdrivetrainSimulator.getLeftPositionMeters());
-    // mLeftEncoderSim.setRate(mdrivetrainSimulator.getLeftVelocityMetersPerSecond());
-    // mRightEncoderSim.setDistance(mdrivetrainSimulator.getRightPositionMeters());
-    // mRightEncoderSim.setRate(mdrivetrainSimulator.getRightVelocityMetersPerSecond());
-    // mGyroSim.setAngle(-mdrivetrainSimulator.getHeading().getDegrees());
+    double xSpeedCommanded;
+    double ySpeedCommanded;
+    double rotSpeedCommanded;
+
+    if (rateLimit) {
+      ChassisSpeeds limitedSpeeds = limitSlewRate(xSpeed, ySpeed, rotSpeed);
+
+      xSpeedCommanded = limitedSpeeds.vxMetersPerSecond;
+      ySpeedCommanded = limitedSpeeds.vyMetersPerSecond;
+      rotSpeedCommanded = limitedSpeeds.omegaRadiansPerSecond;
+    } else {
+      xSpeedCommanded = xSpeed;
+      ySpeedCommanded = ySpeed;
+      rotSpeedCommanded = rotSpeed;
+    }
+
+    // Convert the translational speeds into the correct units for the drivetrain
+    double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
+    double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
+    double rotSpeedDelivered = rotSpeedCommanded;
+
+    setSwerveSpeeds(xSpeedDelivered, ySpeedDelivered, rotSpeedDelivered, fieldRelative);
+  }
+
+  /**
+   * Limit the slew rate of the robot to reduce wear
+   * 
+   * @param xSpeed   Speed of the robot in the x direction (forward).
+   * @param ySpeed   Speed of the robot in the y direction (sideways).
+   * @param rotSpeed Angular rate of the robot.
+   * @return a new limited ChassisSpeeds with the updated values
+   */
+  private ChassisSpeeds limitSlewRate(double xSpeed, double ySpeed, double rotSpeed) {
+    // Convert XY to polar for rate limiting
+    double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
+    double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
+
+    // Calculate the direction slew rate based on an estimate of the lateral
+    // acceleration
+    double directionSlewRate;
+    if (m_currentTranslationMag != 0.0) {
+      directionSlewRate = Math.abs(DriveConstants.kDirectionSlewRate / m_currentTranslationMag);
+    } else {
+      directionSlewRate = 500.0; // some high number that means the slew rate is effectively instantaneous
+    }
+
+    double currentTime = WPIUtilJNI.now() * 1e-6;
+    double elapsedTime = currentTime - m_prevTime;
+    double angleDif = SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
+    if (angleDif < 0.45 * Math.PI) {
+      m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir,
+          directionSlewRate * elapsedTime);
+      m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
+    } else if (angleDif > 0.85 * Math.PI) {
+      if (m_currentTranslationMag > 1e-4) { // some small number to avoid floating-point errors with equality checking
+        // keep currentTranslationDir unchanged
+        m_currentTranslationMag = m_magLimiter.calculate(0.0);
+      } else {
+        m_currentTranslationDir = SwerveUtils.WrapAngle(m_currentTranslationDir + Math.PI);
+        m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
+      }
+    } else {
+      m_currentTranslationDir = SwerveUtils.StepTowardsCircular(m_currentTranslationDir, inputTranslationDir,
+          directionSlewRate * elapsedTime);
+      m_currentTranslationMag = m_magLimiter.calculate(0.0);
+    }
+    m_prevTime = currentTime;
+    m_currentRotation = m_rotLimiter.calculate(rotSpeed);
+
+    double limitedXSpeed = inputTranslationMag * Math.cos(m_currentTranslationDir);
+    double limitedYSpeed = inputTranslationMag * Math.sin(m_currentTranslationDir);
+    double limitedRotSpeed = m_currentRotation;
+
+    return new ChassisSpeeds(limitedXSpeed, limitedYSpeed, limitedRotSpeed);
+  }
+
+  /**
+   * Set the speeds of the swerve modules
+   * 
+   * @param xSpeed        Forward speed of the robot in m/s.
+   * @param ySpeed        Sideways speed of the robot in m/s.
+   * @param rotSpeed      Angular rate of the robot in rad/s.
+   * @param fieldRelative Whether the provided x and y speeds are relative to the
+   *                      field.
+   */
+  private void setSwerveSpeeds(double xSpeed, double ySpeed, double rotSpeed, boolean fieldRelative) {
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotSpeed,
+                getHeading())
+            : new ChassisSpeeds(xSpeed, ySpeed, rotSpeed));
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    setModuleStates(swerveModuleStates);
+  }
+
+  public void driveDiff(double forwardSpeed, double rotSpeed) {
+    driveRobotRelative(new ChassisSpeeds(forwardSpeed, 0, rotSpeed));
+  }
+
+  /**
+   * Drive the robot using a robot relative ChasisSpeeds
+   * 
+   * @param speeds The robot relative ChasisSpeeds
+   */
+  private void driveRobotRelative(ChassisSpeeds speeds) {
+    //ChassisSpeeds limitedSpeeds = limitSlewRate(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
+
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    setModuleStates(swerveModuleStates);
+  }
+
+  private SwerveModulePosition[] getModulePositions() {
+    return new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+    };
+  }
+
+  /**
+   * Get the robot's current speed relative to the robot
+   * 
+   * @return The robot relative ChasisSpeeds
+   */
+  private ChassisSpeeds getRobotRelativeSpeeds() {
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(
+        m_frontLeft.getState(),
+        m_frontRight.getState(),
+        m_rearLeft.getState(),
+        m_rearRight.getState());
+  }
+
+  // Get heading for odometry
+  private Rotation2d getHeadingOdometry() {
+    return Rotation2d.fromDegrees(Math.IEEEremainder(
+        m_gyro.getAngle() * (DriveConstants.kGyroReversed ? -1.0 : 1.0) - DriveConstants.kGyroAdjustment, 360));
+  }
+
+  /**
+   * Sets the wheels into an X formation to prevent movement.
+   */
+  public void setX() {
+    m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+    m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+    m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
+    m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
+  }
+
+  /**
+   * Sets the swerve ModuleStates.
+   *
+   * @param desiredStates The desired SwerveModule states.
+   */
+  private void setModuleStates(SwerveModuleState[] desiredStates) {
+    m_periodicStates = desiredStates;
+  }
+
+  /** Resets the drive encoders to currently read a position of 0. */
+  public void resetdrivingEncoders() {
+    m_frontLeft.resetEncoders();
+    m_rearLeft.resetEncoders();
+    m_frontRight.resetEncoders();
+    m_rearRight.resetEncoders();
+  }
+
+  /**
+   * Returns the heading of the robot.
+   *
+   * @return the robot's heading in degrees, from -180 to 180
+   */
+  public Rotation2d getHeading() {
+    return getPose().getRotation();
+  }
+
+  /**
+   * Returns the translation of the robot.
+   *
+   * @return the robot's translation
+   */
+  public Translation2d getTranslation() {
+    return getPose().getTranslation();
+  }
+
+  /**
+   * Returns the turn rate of the robot.
+   *
+   * @return The turn rate of the robot, in degrees per second
+   */
+  public double getTurnRate() {
+    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 
   @Override
   public void periodic() {
-    var leftFeedforward = mLeftFeedforward.calculate(mPeriodicIO.diffWheelSpeeds.leftMetersPerSecond);
-    var rightFeedforward = mRightFeedforward.calculate(mPeriodicIO.diffWheelSpeeds.rightMetersPerSecond);
-    double leftOutput = mLeftPIDController.calculate(mLeftEncoder.getVelocity(),
-        mPeriodicIO.diffWheelSpeeds.leftMetersPerSecond);
-    double rightOutput = mRightPIDController.calculate(-mRightEncoder.getVelocity(),
-        mPeriodicIO.diffWheelSpeeds.rightMetersPerSecond);
-
-    mPeriodicIO.leftVoltage = leftOutput + leftFeedforward;
-    mPeriodicIO.rightVoltage = rightOutput + rightFeedforward;
-
     updateOdometry();
-
-    m_field.setRobotPose(getPose());
   }
 
   @Override
   public void reset() {
-    // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'reset'");
+  }
+
+  private void updateModuleStates() {
+    if (m_periodicStates == null) return;
+
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        m_periodicStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    m_frontLeft.setDesiredState(m_periodicStates[0]);
+    m_frontRight.setDesiredState(m_periodicStates[1]);
+    m_rearLeft.setDesiredState(m_periodicStates[2]);
+    m_rearRight.setDesiredState(m_periodicStates[3]);
+
+    m_periodicStates = null;
   }
 
   @Override
   public void writePeriodicOutputs() {
-    mLeftGroup.setVoltage(mPeriodicIO.leftVoltage);
-    mRightGroup.setVoltage(mPeriodicIO.rightVoltage);
+    updateModuleStates();
   }
 
   @Override
   public void stop() {
-    mPeriodicIO.diffWheelSpeeds = new DifferentialDriveWheelSpeeds(0.0, 0.0);
+    this.drive(0, 0, 0, false, false);
+    updateModuleStates();
   }
 
   @Override
   public void outputTelemetry() {
-    putNumber("leftVelocitySetPoint", mPeriodicIO.diffWheelSpeeds.leftMetersPerSecond);
-    putNumber("rightVelocitySetPoint", mPeriodicIO.diffWheelSpeeds.rightMetersPerSecond);
-    putNumber("leftVelocity", mLeftEncoder.getVelocity());
-    putNumber("rightVelocity", -mRightEncoder.getVelocity());
-    putNumber("leftMeters", mLeftEncoder.getPosition());
-    putNumber("rightMeters", -mRightEncoder.getPosition());
-    putNumber("Gyro", mGyro.getAngle());
-  }
-
-  public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-    return mSysIdRoutine.quasistatic(direction);
-  }
-
-  public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-    return mSysIdRoutine.dynamic(direction);
+    putNumber("robot heading", getHeading().getDegrees());
+    putNumber("Velocity (RPM)", m_frontLeft.m_drivingSparkMax.getEncoder().getVelocity());
   }
 }

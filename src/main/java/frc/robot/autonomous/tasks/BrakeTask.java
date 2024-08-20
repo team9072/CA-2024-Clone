@@ -24,6 +24,6 @@ public class BrakeTask extends Task {
 
   @Override
   public void done() {
-    m_drive.drive(0, 0);
+    m_drive.stop();
   }
 }

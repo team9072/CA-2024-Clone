@@ -20,6 +20,10 @@ public class DriverController extends FilteredController {
     return -this.getFilteredAxis(1);
   }
 
+  public double getLeftAxis() {
+    return -this.getFilteredAxis(0);
+  }
+
   public double getTurnAxis() {
     return -this.getFilteredAxis(4);
   }

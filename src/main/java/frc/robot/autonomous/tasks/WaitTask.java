@@ -20,7 +20,7 @@ public class WaitTask extends Task {
 
   @Override
   public void update() {
-    m_swerve.drive(0, 0);
+    m_swerve.stop();
   }
 
   @Override

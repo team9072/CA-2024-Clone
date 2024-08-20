@@ -62,10 +62,10 @@ public class DriveTrajectoryTask extends Task {
     m_runningTimer.start();
 
     // Set the initial Pose2d
-    m_drive.setPose(m_autoPath.getStartingDifferentialPose());
+    m_drive.resetOdometry(m_autoPath.getStartingDifferentialPose());
     DriverStation.reportWarning(m_autoPath.getStartingDifferentialPose().toString(), false);
 
-    m_drive.clearTurnPIDAccumulation();
+    //m_drive.clearTurnPIDAccumulation();
     DriverStation.reportWarning("Running path for " + DriverStation.getAlliance().toString(), false);
   }
 
@@ -74,7 +74,7 @@ public class DriveTrajectoryTask extends Task {
     State goal = m_autoTrajectory.sample(m_runningTimer.get());
     ChassisSpeeds chassisSpeeds = m_driveController.calculateRobotRelativeSpeeds(m_drive.getPose(), goal);
 
-    m_drive.drive(
+    m_drive.driveDiff(
         chassisSpeeds.vxMetersPerSecond,
         chassisSpeeds.omegaRadiansPerSecond);
 
@@ -96,7 +96,7 @@ public class DriveTrajectoryTask extends Task {
           autoState.positionMeters.getY(),
           autoState.heading);
 
-      m_drive.setPose(targetPose2d);
+      m_drive.resetOdometry(targetPose2d);
     }
   }
 
@@ -112,6 +112,6 @@ public class DriveTrajectoryTask extends Task {
   @Override
   public void done() {
     DriverStation.reportWarning("Auto trajectory done", false);
-    m_drive.drive(0, 0);
+    m_drive.stop();
   }
 }

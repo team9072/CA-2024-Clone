@@ -31,7 +31,7 @@ public class DriveForwardTask extends Task {
 
   @Override
   public void update() {
-    m_drive.drive(m_speed, 0);
+    m_drive.driveDiff(m_speed, 0);
   }
 
   @Override
@@ -51,7 +51,7 @@ public class DriveForwardTask extends Task {
           newY,
           currentPose.getRotation());
 
-      m_drive.setPose(newPose);
+      m_drive.resetOdometry(newPose);
       m_lastTime = m_runningTimer.get();
     }
   }
@@ -65,6 +65,6 @@ public class DriveForwardTask extends Task {
   @Override
   public void done() {
     DriverStation.reportWarning("Auto driving done", false);
-    m_drive.drive(0, 0);
+    m_drive.stop();
   }
 }
