@@ -46,6 +46,7 @@ import frc.robot.Constants;
 import frc.robot.simulation.Field;
 import frc.robot.simulation.SimulatableCANSparkMax;
 
+@Deprecated()
 public class DiffDrivetrain extends Subsystem {
   // 1 meters per second.
   public static final double kMaxSpeed = 2.0;
