@@ -12,9 +12,10 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
 public class Constants {
-  public static class Robot {
+  public static class RobotConstants {
     public static final double k_width = 28; // Inches
     public static final double k_length = 28; // Inches
+    public static final int kPdhId = 1;
   }
 
   public static class Intake {
@@ -104,9 +105,9 @@ public class Constants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration (28x28)
-    public static final double kTrackWidth = Units.inchesToMeters(Robot.k_width);
+    public static final double kTrackWidth = Units.inchesToMeters(RobotConstants.k_width);
     // Distance between centers of right and left wheels on robot (24*24)
-    public static final double kWheelBase = Units.inchesToMeters(Robot.k_length); // 18.5?
+    public static final double kWheelBase = Units.inchesToMeters(RobotConstants.k_length); // 18.5?
     // Distance from center to furthest wheel (*diagonal*)
     public static final double kCenterToWheel = Units.inchesToMeters(Math.sqrt(121 + 121)); // 11^2 + 11^2 PT
     // Distance between front and back wheels on robot
