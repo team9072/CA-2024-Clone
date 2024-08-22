@@ -1,5 +1,7 @@
 package frc.robot.controls.controllers;
 
+import edu.wpi.first.wpilibj.XboxController.Button;
+
 public class OperatorController extends FilteredController {
 
   public OperatorController(int port) {
@@ -10,36 +12,17 @@ public class OperatorController extends FilteredController {
     super(port, useDeadband, useSquaredInput);
   }
 
-  // Axis
-  private final double k_triggerActivationThreshold = 0.5;
-
-  public boolean getWantsTriggerSomething1() {
-    return this.getFilteredAxis(3) > k_triggerActivationThreshold;
-  }
-
-  public boolean getWantsTriggerSomething2() {
-    return this.getFilteredAxis(2) > k_triggerActivationThreshold;
-  }
-
   // Buttons
-  public boolean getWantsBrakeMode() {
-    return this.getRawButton(1);
-  }
-
-  public boolean getWantsCoastMode() {
-    return this.getRawButton(2);
-  }
-
   public boolean getWantsMoreSpeed() {
-    return this.getRawButtonPressed(6);
+    return this.getButtonPressed(Button.kRightBumper);
   }
 
   public boolean getWantsLessSpeed() {
-    return this.getRawButtonPressed(5);
+    return this.getButtonPressed(Button.kLeftBumper);
   }
 
   public boolean getWantsShooterStop() {
-    return this.getRawButtonPressed(4);
+    return this.getButtonPressed(Button.kY);
   }
 
   // D pad

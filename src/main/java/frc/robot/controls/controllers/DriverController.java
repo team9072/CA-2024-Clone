@@ -1,10 +1,10 @@
 package frc.robot.controls.controllers;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.XboxController.Axis;
+import edu.wpi.first.wpilibj.XboxController.Button;
 
 public class DriverController extends FilteredController {
-  private String m_smartDashboardKey = "DriverInput/";
-
+  
   public DriverController(int port) {
     super(port, false, false);
   }
@@ -17,44 +17,36 @@ public class DriverController extends FilteredController {
   private final double k_triggerActivationThreshold = 0.5;
 
   public double getForwardAxis() {
-    return -this.getFilteredAxis(1);
+    return -this.getFilteredAxis(Axis.kLeftY);
   }
 
   public double getLeftAxis() {
-    return -this.getFilteredAxis(0);
+    return -this.getFilteredAxis(Axis.kLeftY);
   }
 
   public double getTurnAxis() {
-    return -this.getFilteredAxis(4);
-  }
-
-  public double getShooterAxis() {
-    return (this.getFilteredAxis(3) - 0.5) * 2;
+    return -this.getFilteredAxis(Axis.kRightX);
   }
 
   public boolean getWantsFullIntake() {
-    return this.getRawButton(1);
+    return this.getButton(Button.kA);
   }
 
   public boolean getWantsIntake() {
-    return this.getRawButton(6);
+    return this.getButton(Button.kRightBumper);
   }
 
   public boolean getWantsEject() {
-    return this.getRawButton(2);
+    return this.getButton(Button.kB);
   }
 
   public boolean getWantsSource() {
-    return this.getRawButton(3);
+    return this.getButton(Button.kX);
   }
 
   public boolean getWantsStow() {
-    return this.getRawButton(4);
+    return this.getButton(Button.kY);
   }
-
-  // public boolean getWantsFire() {
-  // return this.getHatUpPressed();
-  // }
 
   public boolean getWantsMoreSpeed() {
     return this.getHatUp();
@@ -65,36 +57,14 @@ public class DriverController extends FilteredController {
   }
 
   public boolean getWantsShooterStop() {
-    return this.getRawButton(5);
+    return this.getButton(Button.kLeftBumper);
   }
 
   public boolean getWantsSpeedMode() {
-    return this.getFilteredAxis(2) > k_triggerActivationThreshold;
+    return this.getFilteredAxis(Axis.kLeftTrigger) > k_triggerActivationThreshold;
   }
 
   public boolean getWantsSlowMode() {
-    return this.getFilteredAxis(3) > k_triggerActivationThreshold;
-  }
-
-  // Buttons
-  public boolean getWantsSomethingToggle() {
-    return this.getRawButtonPressed(1);
-  }
-
-  public boolean getWantsSomething2Toggle() {
-    return this.getRawButtonPressed(3);
-  }
-
-  public boolean getWantsResetGyro() {
-    return this.getRawButton(4);
-  }
-
-  // public boolean getWantsBrake() {
-  // return this.getRawButton(5);
-  // }
-
-  public void outputTelemetry() {
-    SmartDashboard.putNumber(m_smartDashboardKey + "Forward", getForwardAxis());
-    SmartDashboard.putNumber(m_smartDashboardKey + "Turn", getTurnAxis());
+    return this.getFilteredAxis(Axis.kRightTrigger) > k_triggerActivationThreshold;
   }
 }

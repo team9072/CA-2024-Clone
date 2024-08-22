@@ -1,6 +1,8 @@
 package frc.robot.controls.controllers;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.XboxController.Axis;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import frc.robot.controls.Deadband;
 import frc.robot.controls.SquaredInput;
 
@@ -30,6 +32,14 @@ public class FilteredController extends GenericHID {
     this.m_useSquaredInput = useSquaredInput;
   }
 
+  public boolean getButton(Button button) {
+    return this.getRawButton(button.value);
+  }
+
+  public boolean getButtonPressed(Button button) {
+    return this.getRawButtonPressed(button.value);
+  }
+
   public double getFilteredAxis(int axis) {
     double value = this.getRawAxis(axis);
 
@@ -44,6 +54,10 @@ public class FilteredController extends GenericHID {
     }
 
     return value;
+  }
+
+  public double getFilteredAxis(Axis aixs) {
+    return this.getFilteredAxis(aixs.value);
   }
 
   public boolean getHatUp() {
