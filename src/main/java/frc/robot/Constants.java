@@ -20,8 +20,8 @@ public class Constants {
 
   public static class Intake {
     // Motors
-    public static final int kIntakeMotorId = 9;
-    public static final int kPivotMotorId = 10;
+    public static final int kIntakeMotorId = 12;
+    public static final int kPivotMotorId = 13;
 
     // DIO
     public static final int k_pivotEncoderId = 0;
@@ -49,8 +49,8 @@ public class Constants {
   // DIO
 
   // Shooter
-  public static final int kShooterLeftMotorId = 12;
-  public static final int kShooterRightMotorId = 13;
+  public static final int kShooterLeftMotorId = 10;
+  public static final int kShooterRightMotorId = 11;
 
   public static final double kShooterP = 0.00005;
   public static final double kShooterI = 0.0;
@@ -75,7 +75,8 @@ public class Constants {
 
   public static final double kClimberMaxOutput = 0.5;
 
-  // Drivetrain
+  // Old diff drivetrain constants
+  @Deprecated
   public static class Drive {
     public static final double kP = 0.085;
     public static final double kI = 0.0;
@@ -125,15 +126,15 @@ public class Constants {
     public static final double kBackLeftChassisAngularOffset = Math.PI;
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
-    public static final int kFrontLeftDrivingCanId = 1;
-    public static final int kFrontRightDrivingCanId = 2;
-    public static final int kRearLeftDrivingCanId = 3;
-    public static final int kRearRightDrivingCanId = 4;
+    public static final int kFrontLeftDrivingCanId = 2;
+    public static final int kFrontRightDrivingCanId = 4;
+    public static final int kRearLeftDrivingCanId = 6;
+    public static final int kRearRightDrivingCanId = 8;
 
-    public static final int kFrontLeftTurningCanId = 5;
+    public static final int kFrontLeftTurningCanId = 3;
+    public static final int kFrontRightTurningCanId = 5;
     public static final int kRearLeftTurningCanId = 7;
-    public static final int kFrontRightTurningCanId = 6;
-    public static final int kRearRightTurningCanId = 8;
+    public static final int kRearRightTurningCanId = 9;
 
     public static final boolean kGyroReversed = true;
     public static final double kGyroAdjustment = 0.0;
