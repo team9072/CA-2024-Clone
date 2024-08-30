@@ -53,10 +53,14 @@ public class DriverController extends FilteredController {
   }
 
   public boolean getWantsLessSpeed() {
-    return this.getHatDown();
+    return this.getHatLeft() || this.getHatRight();
   }
 
   public boolean getWantsShooterStop() {
+    return this.getHatDown();
+  }
+
+  public boolean getWantsGyroReset() {
     return this.getButton(Button.kLeftBumper);
   }
 

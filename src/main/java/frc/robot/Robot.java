@@ -137,7 +137,11 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    m_drive.drive(m_driverController.getForwardAxis(), m_driverController.getLeftAxis(), m_driverController.getTurnAxis(), false, true);
+    m_drive.drive(m_driverController.getForwardAxis(), m_driverController.getLeftAxis(), m_driverController.getTurnAxis(), true, true);
+
+    if (m_driverController.getWantsGyroReset()) {
+      m_drive.resetGyro();
+    }
 
     // Shooter variable speed
     if (m_driverController.getWantsMoreSpeed() || m_operatorController.getWantsMoreSpeed()) {
