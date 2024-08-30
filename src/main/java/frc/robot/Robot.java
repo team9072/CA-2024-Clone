@@ -252,7 +252,8 @@ public class Robot extends LoggedRobot {
     Logger.recordMetadata("ProjectName", "Flipside"); // Set a metadata value
 
     if (isReal()) {
-      Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
+      // Disable advantagekit logger as we dont have a usb in the rio
+      //Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
       new PowerDistribution(RobotConstants.kPdhId, ModuleType.kRev); // Enables power distribution logging
     }
