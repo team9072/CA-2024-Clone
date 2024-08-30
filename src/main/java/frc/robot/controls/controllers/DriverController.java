@@ -21,7 +21,7 @@ public class DriverController extends FilteredController {
   }
 
   public double getLeftAxis() {
-    return -this.getFilteredAxis(Axis.kLeftY);
+    return -this.getFilteredAxis(Axis.kLeftX);
   }
 
   public double getTurnAxis() {
