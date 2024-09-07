@@ -24,17 +24,16 @@ public class Constants {
     public static final int kPivotMotorId = 13;
 
     // DIO
-    public static final int k_pivotEncoderId = 0;
     public static final int k_intakeLimitSwitchId = 2;
 
-    // Absolute encoder offset
-    public static final double k_pivotEncoderOffset = 0.166842; // Straight up, sketchy to reset to "up"
+    // Offset where outward horizontal is zero
+    public static final double k_pivotEncoderOffset = -Math.PI / 2;
 
     // Pivot set point angles
-    public static final double k_pivotAngleGround = 60;
-    public static final double k_pivotAngleSource = 190;
+    public static final double k_pivotAngleGround = 0;
+    public static final double k_pivotAngleSource = 0;
     public static final double k_pivotAngleAmp = k_pivotAngleSource;
-    public static final double k_pivotAngleStow = 275;
+    public static final double k_pivotAngleStow = 0;
 
     // Intake speeds
     public static final double k_intakeSpeed = 0.7;
