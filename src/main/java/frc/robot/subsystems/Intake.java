@@ -256,7 +256,7 @@ public class Intake extends Subsystem {
   // Pivot helper functions
   public void goToGround() {
     setPivotTarget(PivotTarget.GROUND);
-    //FIXME: m_periodicIO.intake_state = IntakeState.INTAKE;
+    m_periodicIO.intake_state = IntakeState.INTAKE;
     m_leds.setColor(Color.kYellow);
   }
 
