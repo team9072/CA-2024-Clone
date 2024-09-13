@@ -44,7 +44,7 @@ public class Intake extends Subsystem {
   private final SparkAbsoluteEncoder m_pivotEncoder;
 
 
-  private final DigitalInput m_IntakeLimitSwitch = new DigitalInput(Constants.Intake.k_intakeLimitSwitchId);
+  private final DigitalInput m_NoteDetectionBeamBreak = new DigitalInput(Constants.Intake.k_beamBreakDioId);
 
   public final LEDs m_leds = LEDs.getInstance();
 
@@ -248,9 +248,9 @@ public class Intake extends Subsystem {
   public boolean getIntakeHasNote() {
     // NOTE: this is intentionally inverted, because the limit switch is normally
     // closed
-    //TODO: Note detection
+    //FIXME: Uncomment once beam break is wired
     return false;
-    //return !m_IntakeLimitSwitch.get();
+    //return !m_NoteDetectionBeamBreak.get();
   }
 
   // Pivot helper functions

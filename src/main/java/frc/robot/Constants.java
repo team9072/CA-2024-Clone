@@ -24,7 +24,7 @@ public class Constants {
     public static final int kPivotMotorId = 13;
 
     // DIO
-    public static final int k_intakeLimitSwitchId = 2;
+    public static final int k_beamBreakDioId = 0;
 
     // Offset where outward horizontal is zero
     public static final double k_pivotEncoderOffset = -Math.PI;
