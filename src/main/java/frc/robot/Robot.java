@@ -131,6 +131,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
+    m_intake.resetPivotMotion();
   }
 
   double speed = 0;
@@ -164,7 +165,9 @@ public class Robot extends LoggedRobot {
       if (m_intake.getIntakeHasNote()) {
         m_intake.pulse();
       } else {
-        m_intake.intake();
+        //m_intake.intake();
+        m_intake.goToGround();
+        m_intake.stopIntake();
       }
     } else if (m_driverController.getWantsEject()) {
       m_intake.eject();

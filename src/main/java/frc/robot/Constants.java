@@ -27,13 +27,13 @@ public class Constants {
     public static final int k_intakeLimitSwitchId = 2;
 
     // Offset where outward horizontal is zero
-    public static final double k_pivotEncoderOffset = -Math.PI / 2;
+    public static final double k_pivotEncoderOffset = -Math.PI;
 
     // Pivot set point angles
-    public static final double k_pivotAngleGround = 0;
-    public static final double k_pivotAngleSource = 0;
+    public static final double k_pivotAngleGround = 0.2;
+    public static final double k_pivotAngleSource = -1;
     public static final double k_pivotAngleAmp = k_pivotAngleSource;
-    public static final double k_pivotAngleStow = 0;
+    public static final double k_pivotAngleStow = -3;
 
     // Intake speeds
     public static final double k_intakeSpeed = 0.7;
@@ -124,7 +124,7 @@ public class Constants {
     public static final double kFrontRightChassisAngularOffset = 0;
     public static final double kBackLeftChassisAngularOffset = Math.PI;
     public static final double kBackRightChassisAngularOffset = Math.PI / 2;
-
+    
     public static final int kFrontLeftDrivingCanId = 2;
     public static final int kFrontRightDrivingCanId = 4;
     public static final int kRearLeftDrivingCanId = 6;
