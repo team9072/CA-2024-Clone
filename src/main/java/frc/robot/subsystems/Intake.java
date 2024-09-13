@@ -173,7 +173,7 @@ public class Intake extends Subsystem {
     putNumber("Pivot/Output Voltage", m_periodicIO.intake_pivot_voltage);
     putNumber("Pivot/Current", mPivotMotor.getOutputCurrent());
 
-    putBoolean("Limit Switch", getIntakeHasNote());
+    putBoolean("Beam Break", getIntakeHasNote());
   }
 
   @Override
@@ -248,9 +248,7 @@ public class Intake extends Subsystem {
   public boolean getIntakeHasNote() {
     // NOTE: this is intentionally inverted, because the limit switch is normally
     // closed
-    //FIXME: Uncomment once beam break is wired
-    return false;
-    //return !m_NoteDetectionBeamBreak.get();
+    return !m_NoteDetectionBeamBreak.get();
   }
 
   // Pivot helper functions
