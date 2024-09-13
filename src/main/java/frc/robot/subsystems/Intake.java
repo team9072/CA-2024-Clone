@@ -5,6 +5,7 @@ import com.revrobotics.CANSparkLowLevel.PeriodicFrame;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.SparkAbsoluteEncoder;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -156,6 +157,7 @@ public class Intake extends Subsystem {
   @Override
   public void stop() {
     setPivotTarget(PivotTarget.NONE);
+    stopIntake();
     m_periodicIO.intake_pivot_enabled = false;
     m_periodicIO.intake_speed = 0.0;
   }
@@ -238,7 +240,10 @@ public class Intake extends Subsystem {
   }
 
   public double getPivotAngleRadians() {
-    return m_pivotEncoder.getPosition() + Constants.Intake.k_pivotEncoderOffset;
+    double recordedPosition = m_pivotEncoder.getPosition() + Constants.Intake.k_pivotEncoderOffset;
+    // Change the modulus from -pi to pi to -pi-1 to pi-1
+    // This fixes the issue of the encoder wrapping when at the zero point
+    return MathUtil.angleModulus(recordedPosition + 1) - 1;
   }
 
   public double getPivotSpeedRadians() {
