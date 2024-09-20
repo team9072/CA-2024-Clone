@@ -60,8 +60,9 @@ public class Shooter extends Subsystem {
     mLeftShooterEncoder = mLeftShooterMotor.getEncoder();
     mRightShooterEncoder = mRightShooterMotor.getEncoder();
 
-    mLeftShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kCoast);
-    mRightShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kCoast);
+    // TODO: break mode?
+    mLeftShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
+    mRightShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
 
     mLeftShooterMotor.setInverted(true);
     mRightShooterMotor.setInverted(false);

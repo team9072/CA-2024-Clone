@@ -138,7 +138,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    m_drive.drive(m_driverController.getForwardAxis(), m_driverController.getLeftAxis(), m_driverController.getTurnAxis(), true, true);
+    m_drive.drive(-m_driverController.getForwardAxis(), -m_driverController.getLeftAxis(), -m_driverController.getTurnAxis(), true, true);
 
     if (m_driverController.getWantsGyroReset()) {
       m_drive.resetGyro();
@@ -147,10 +147,10 @@ public class Robot extends LoggedRobot {
     // Shooter variable speed
     if (m_driverController.getWantsMoreSpeed() || m_operatorController.getWantsMoreSpeed()) {
       m_leds.setColor(Color.kPink);
-      speed = 3000;
+      speed = 10000;
     } else if (m_driverController.getWantsLessSpeed() || m_operatorController.getWantsLessSpeed()) {
       m_leds.setColor(Color.kOrange);
-      speed = 430;
+      speed = 9000;
     } else if (m_driverController.getWantsShooterStop() || m_operatorController.getWantsShooterStop()) {
       m_leds.defaultLEDS();
       speed = 0;
