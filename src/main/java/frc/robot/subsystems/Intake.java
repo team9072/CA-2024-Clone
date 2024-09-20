@@ -13,6 +13,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
 import frc.robot.subsystems.leds.LEDs;
@@ -52,6 +53,9 @@ public class Intake extends Subsystem {
   /*-------------------------------- Private instance variables ---------------------------------*/
   private static Intake mInstance;
   private PeriodicIO m_periodicIO;
+
+  private Timer m_lastGroundIntakeStarted = new Timer();
+  private boolean m_intakedNoteState = false;
 
   public static Intake getInstance() {
     if (mInstance == null) {
@@ -261,6 +265,9 @@ public class Intake extends Subsystem {
     setPivotTarget(PivotTarget.GROUND);
     m_periodicIO.intake_state = IntakeState.INTAKE;
     m_leds.setColor(Color.kYellow);
+    m_intakedNoteState = false;
+    m_lastGroundIntakeStarted.reset();
+    m_lastGroundIntakeStarted.start();
   }
 
   public void goToSource() {
@@ -307,10 +314,12 @@ public class Intake extends Subsystem {
 
   /*---------------------------------- Custom Private Functions ---------------------------------*/
   private void checkAutoTasks() {
+    SmartDashboard.putNumber("Current", mIntakeMotor.getOutputCurrent());
     // If the intake is set to GROUND, and the intake has a note, and the pivot is
     // close to it's target
     // Stop the intake and go to the SOURCE position
-    if (m_periodicIO.pivot_target == PivotTarget.GROUND && getIntakeHasNote() && atTarget()) {
+    if (m_lastGroundIntakeStarted.get() > 1 && m_periodicIO.pivot_target == PivotTarget.GROUND && mIntakeMotor.getOutputCurrent() > 20 && atTarget() && !m_intakedNoteState) {
+      m_intakedNoteState = true;
       setPivotTarget(PivotTarget.STOW);
       m_periodicIO.intake_state = IntakeState.NONE;
       m_leds.setColor(Color.kGreen);
