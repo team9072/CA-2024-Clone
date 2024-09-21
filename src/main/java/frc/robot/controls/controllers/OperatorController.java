@@ -18,11 +18,11 @@ public class OperatorController extends FilteredController {
   }
 
   public boolean getWantsLessSpeed() {
-    return this.getButtonPressed(Button.kLeftBumper);
+    return false;
   }
 
   public boolean getWantsShooterStop() {
-    return this.getButtonPressed(Button.kY);
+    return this.getButtonPressed(Button.kLeftBumper);
   }
 
   // D pad

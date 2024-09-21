@@ -103,6 +103,8 @@ public class MAXSwerveModule {
     m_drivingSparkMax.setSmartCurrentLimit(ModuleConstants.kDrivingMotorCurrentLimit);
     m_turningSparkMax.setSmartCurrentLimit(ModuleConstants.kTurningMotorCurrentLimit);
 
+    m_turningSparkMax.setInverted(false);
+
     // Force brake mode for turning motors
     m_turningSparkMax.setIdleMode(IdleMode.kBrake);
 

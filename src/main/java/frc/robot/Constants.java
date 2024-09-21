@@ -24,14 +24,14 @@ public class Constants {
     public static final int kPivotMotorId = 13;
 
     // DIO
-    public static final int k_beamBreakDioId = 0;
+    public static final int k_beamBreakDioId = 1;
 
     // Offset where outward horizontal is zero
     public static final double k_pivotEncoderOffset = -Math.PI;
 
     // Pivot set point angles
-    public static final double k_pivotAngleGround = 0.45;
-    public static final double k_pivotAngleSource = -1;
+    public static final double k_pivotAngleGround = .6;
+    public static final double k_pivotAngleSource = -3;
     public static final double k_pivotAngleAmp = k_pivotAngleSource;
     public static final double k_pivotAngleStow = -3;
 

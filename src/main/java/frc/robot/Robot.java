@@ -10,14 +10,15 @@ import java.util.List;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.autonomous.AutoChooser;
 import frc.robot.autonomous.AutoRunner;
@@ -25,7 +26,6 @@ import frc.robot.autonomous.tasks.Task;
 import frc.robot.controls.controllers.DriverController;
 import frc.robot.controls.controllers.OperatorController;
 import frc.robot.simulation.Field;
-import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Compressor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
@@ -54,7 +54,7 @@ public class Robot extends LoggedRobot {
   private final Compressor m_compressor = Compressor.getInstance();
   private final Drivetrain m_drive = Drivetrain.getInstance();
   private final Shooter m_shooter = Shooter.getInstance();
-  private final Climber m_climber = Climber.getInstance();
+  // private final Climber m_climber = Climber.getInstance();
   public final LEDs m_leds = LEDs.getInstance();
 
   // Auto stuff
@@ -77,7 +77,6 @@ public class Robot extends LoggedRobot {
     m_allSubsystems.add(m_compressor);
     m_allSubsystems.add(m_drive);
     m_allSubsystems.add(m_shooter);
-    m_allSubsystems.add(m_climber);
     m_allSubsystems.add(m_leds);
 
     // Set up the Field2d object for simulation
@@ -140,63 +139,41 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
     m_drive.drive(-m_driverController.getForwardAxis(), -m_driverController.getLeftAxis(), -m_driverController.getTurnAxis(), true, true);
 
+    // left bumper to reset gyro
     if (m_driverController.getWantsGyroReset()) {
       m_drive.resetGyro();
     }
 
-    // Shooter variable speed
-    if (m_driverController.getWantsMoreSpeed() || m_operatorController.getWantsMoreSpeed()) {
-      m_leds.setColor(Color.kPink);
-      speed = 10000;
-    } else if (m_driverController.getWantsLessSpeed() || m_operatorController.getWantsLessSpeed()) {
-      m_leds.setColor(Color.kOrange);
-      speed = 9000;
-    } else if (m_driverController.getWantsShooterStop() || m_operatorController.getWantsShooterStop()) {
-      m_leds.defaultLEDS();
+    // Shooter: Hold RightBumper to spin, release to stop.
+    // Then, you can easily tap B to score.
+    if (m_operatorController.getButton(Button.kRightBumper)) {
+      // Hold Back to slow down the shooter
+      if (m_operatorController.getButton(Button.kBack)) {
+        speed = 5000;
+      } else {
+        speed = 10000;
+      }
+    } else {
       speed = 0;
     }
-    speed = MathUtil.clamp(speed, -6000, 10000);
+    
     m_shooter.setSpeed(speed);
 
-    // Intake
-    if (m_driverController.getWantsFullIntake()) {
+    // Scoring process
+    // A to go down and intake, beam break detects and goes up, right trigger to spin shooter, B to launch
+
+    // Intake commands
+    if (m_operatorController.getButton(Button.kA)) {
       m_intake.goToGround();
-    } else if (m_driverController.getWantsIntake()) {
-      if (m_intake.getIntakeHasNote()) {
-        m_intake.pulse();
-      } else {
-        //m_intake.intake();
-        m_intake.goToGround();
-        m_intake.stopIntake();
-      }
-    } else if (m_driverController.getWantsEject()) {
+    } else if (m_operatorController.getButton(Button.kB)) {
       m_intake.eject();
-    } else if (m_driverController.getWantsSource()) {
+    } else if (m_operatorController.getButton(Button.kX)) {
       m_intake.goToSource();
-    } else if (m_driverController.getWantsStow()) {
+    } else if (m_operatorController.getButton(Button.kY)) {
       m_intake.goToStow();
     } else if (m_intake.getIntakeState() != IntakeState.INTAKE) {
       m_intake.stopIntake();
     }
-
-    // Climber
-    if (m_operatorController.getWantsClimberClimb()) {
-      m_climber.climb();
-    } else if (m_operatorController.getWantsClimberRelease()) {
-      m_climber.release();
-    } else if (m_operatorController.getWantsClimberTiltLeft()) {
-      m_climber.tiltLeft();
-    } else if (m_operatorController.getWantsClimberTiltRight()) {
-      m_climber.tiltRight();
-    } else {
-      m_climber.stopClimber();
-    }
-
-    // if (m_operatorController.getWantsBrakeMode()) {
-    // m_climber.setBrakeMode();
-    // } else if (m_operatorController.getWantsCoastMode()) {
-    // m_climber.setCoastMode();
-    // }
   }
 
   @Override

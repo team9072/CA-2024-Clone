@@ -43,24 +43,24 @@ public class Shooter extends Subsystem {
     mLeftShooterMotor.restoreFactoryDefaults();
     mRightShooterMotor.restoreFactoryDefaults();
 
-    mLeftShooterPID = mLeftShooterMotor.getPIDController();
-    mLeftShooterPID.setP(Constants.kShooterP);
-    mLeftShooterPID.setI(Constants.kShooterI);
-    mLeftShooterPID.setD(Constants.kShooterD);
-    mLeftShooterPID.setFF(Constants.kShooterFF);
-    mLeftShooterPID.setOutputRange(Constants.kShooterMinOutput, Constants.kShooterMaxOutput);
+    // I want 0-1 instantly :) - Akram
+    // mLeftShooterPID = mLeftShooterMotor.getPIDController();
+    // mLeftShooterPID.setP(Constants.kShooterP);
+    // mLeftShooterPID.setI(Constants.kShooterI);
+    // mLeftShooterPID.setD(Constants.kShooterD);
+    // mLeftShooterPID.setFF(Constants.kShooterFF);
+    // mLeftShooterPID.setOutputRange(Constants.kShooterMinOutput, Constants.kShooterMaxOutput);
 
-    mRightShooterPID = mRightShooterMotor.getPIDController();
-    mRightShooterPID.setP(Constants.kShooterP);
-    mRightShooterPID.setI(Constants.kShooterI);
-    mRightShooterPID.setD(Constants.kShooterD);
-    mRightShooterPID.setFF(Constants.kShooterFF);
-    mRightShooterPID.setOutputRange(Constants.kShooterMinOutput, Constants.kShooterMaxOutput);
+    // mRightShooterPID = mRightShooterMotor.getPIDController();
+    // mRightShooterPID.setP(Constants.kShooterP);
+    // mRightShooterPID.setI(Constants.kShooterI);
+    // mRightShooterPID.setD(Constants.kShooterD);
+    // mRightShooterPID.setFF(Constants.kShooterFF);
+    // mRightShooterPID.setOutputRange(Constants.kShooterMinOutput, Constants.kShooterMaxOutput);
 
     mLeftShooterEncoder = mLeftShooterMotor.getEncoder();
     mRightShooterEncoder = mRightShooterMotor.getEncoder();
 
-    // TODO: break mode?
     mLeftShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
     mRightShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
 
@@ -81,9 +81,9 @@ public class Shooter extends Subsystem {
 
   @Override
   public void writePeriodicOutputs() {
-    double limitedSpeed = mSpeedLimiter.calculate(mPeriodicIO.shooter_rpm);
-    mLeftShooterPID.setReference(limitedSpeed, ControlType.kVelocity);
-    mRightShooterPID.setReference(limitedSpeed, ControlType.kVelocity);
+    double limitedSpeed = mPeriodicIO.shooter_rpm / 10000;
+    mLeftShooterMotor.set(limitedSpeed);
+    mRightShooterMotor.set(limitedSpeed);
   }
 
   @Override

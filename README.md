@@ -1,30 +1,23 @@
-# CA24_RobotCode
+# CA-2024-Clone
 
-## Description
+Cranberry Alarm clone for Team 9072.
 
-Cranberry Alarm's 2024 robot code.
+## Controls
 
-## Table of Contents
-- [Documentation](#documentation)
-- [Build](#build)
-- [Simulation](#simulate)
-- [Deploy](#deploy)
+### Driver
+- Joysticks to move
+- Left Bumper to reset gyro
 
-## Documentation
+### Operator
+- **A** to move intake to the ground **and** begin intaking
+- **B** to begin outtaking
+- **Y** to move intake to the stow position (aka. zero position, aka. position to shoot out note)
+- **Hold** Right Bumper to spin up the shooters. **Hold** Back simultaneously to slow down the shooters. **Release** Right Bumper to stop the shooters
 
-- [2024 Game Manual](https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf)
-- [WPILib Documentation](https://docs.wpilib.org/en/stable/index.html)
+## Scoring Process
 
-## Build
-
-```
-./gradlew build
-```
-
-## Simulation
-
-## Deploy
-
-```
-./gradlew deploy
-```
+1. Press A
+2. Intake a note
+3. Wait for the intake to automatically move to the stow position. If it does not detect the note, quick-tap B to outake the note in hopes that will adjust it and have the beam break see it
+4. Once the intake is up, hold Right Bumper to spin up the shooter wheels 
+5. Press B to shoot
