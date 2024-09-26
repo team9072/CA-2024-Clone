@@ -61,7 +61,7 @@ public class DriverController extends FilteredController {
   }
 
   public boolean getWantsGyroReset() {
-    return this.getButton(Button.kLeftBumper);
+    return this.getButton(Button.kX);
   }
 
   public boolean getWantsSpeedMode() {

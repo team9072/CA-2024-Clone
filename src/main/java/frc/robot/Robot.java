@@ -139,7 +139,7 @@ public class Robot extends LoggedRobot {
   public void teleopPeriodic() {
     m_drive.drive(-m_driverController.getForwardAxis(), -m_driverController.getLeftAxis(), -m_driverController.getTurnAxis(), true, true);
 
-    // left bumper to reset gyro
+    // X to reset gyro
     if (m_driverController.getWantsGyroReset()) {
       m_drive.resetGyro();
     }
