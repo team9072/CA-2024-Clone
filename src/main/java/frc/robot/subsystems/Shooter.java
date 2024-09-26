@@ -43,26 +43,11 @@ public class Shooter extends Subsystem {
     mLeftShooterMotor.restoreFactoryDefaults();
     mRightShooterMotor.restoreFactoryDefaults();
 
-    // I want 0-1 instantly :) - Akram
-    // mLeftShooterPID = mLeftShooterMotor.getPIDController();
-    // mLeftShooterPID.setP(Constants.kShooterP);
-    // mLeftShooterPID.setI(Constants.kShooterI);
-    // mLeftShooterPID.setD(Constants.kShooterD);
-    // mLeftShooterPID.setFF(Constants.kShooterFF);
-    // mLeftShooterPID.setOutputRange(Constants.kShooterMinOutput, Constants.kShooterMaxOutput);
-
-    // mRightShooterPID = mRightShooterMotor.getPIDController();
-    // mRightShooterPID.setP(Constants.kShooterP);
-    // mRightShooterPID.setI(Constants.kShooterI);
-    // mRightShooterPID.setD(Constants.kShooterD);
-    // mRightShooterPID.setFF(Constants.kShooterFF);
-    // mRightShooterPID.setOutputRange(Constants.kShooterMinOutput, Constants.kShooterMaxOutput);
-
     mLeftShooterEncoder = mLeftShooterMotor.getEncoder();
     mRightShooterEncoder = mRightShooterMotor.getEncoder();
 
-    mLeftShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
-    mRightShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kBrake);
+    mLeftShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kCoast);
+    mRightShooterMotor.setIdleMode(CANSparkFlex.IdleMode.kCoast);
 
     mLeftShooterMotor.setInverted(true);
     mRightShooterMotor.setInverted(false);
