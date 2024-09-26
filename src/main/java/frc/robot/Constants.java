@@ -31,8 +31,9 @@ public class Constants {
 
     // Pivot set point angles
     public static final double k_pivotAngleGround = .6;
-    public static final double k_pivotAngleAmp = -1;
     public static final double k_pivotAngleStow = -3;
+    // Slows down the pivot before this angle
+    public static final double k_pivotAngleSlow = -1;
 
     // Intake speeds
     public static final double k_intakeSpeed = 0.4; // .7

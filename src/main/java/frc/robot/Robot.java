@@ -167,8 +167,6 @@ public class Robot extends LoggedRobot {
       m_intake.goToGround();
     } else if (m_operatorController.getWantsIntakeEject()) {
       m_intake.eject();
-    } else if (m_operatorController.getWantsIntakeAtAmp()) {
-      m_intake.goToAmp();
     } else if (m_operatorController.getWantsIntakeStow()) {
       m_intake.goToStow();
     } else if (m_intake.getIntakeState() != IntakeState.INTAKE) {

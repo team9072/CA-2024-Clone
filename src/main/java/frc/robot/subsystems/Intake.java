@@ -104,7 +104,6 @@ public class Intake extends Subsystem {
   public enum PivotTarget {
     NONE,
     GROUND,
-    AMP,
     STOW
   }
 
@@ -131,7 +130,7 @@ public class Intake extends Subsystem {
     m_periodicIO.intake_pivot_goal.position = pivot_goal;
     double currentAngle = getPivotAngleRadians();
 
-    Constraints constraints = currentAngle <= Constants.Intake.k_pivotAngleAmp ? k_stowConstraints : k_deployConstraints;
+    Constraints constraints = currentAngle <= Constants.Intake.k_pivotAngleSlow ? k_stowConstraints : k_deployConstraints;
     double feedbackVoltage = m_pivotController.calculate(currentAngle, m_periodicIO.intake_pivot_goal, constraints);
     feedbackVoltage += Math.signum(feedbackVoltage) * k_pivotMotorKs;
     State setpoint = m_pivotController.getSetpoint();
@@ -200,8 +199,6 @@ public class Intake extends Subsystem {
     switch (target) {
       case GROUND:
         return Constants.Intake.k_pivotAngleGround;
-      case AMP:
-        return Constants.Intake.k_pivotAngleAmp;
       case STOW:
         return Constants.Intake.k_pivotAngleStow;
       default:
@@ -259,11 +256,6 @@ public class Intake extends Subsystem {
     setPivotTarget(PivotTarget.GROUND);
     m_periodicIO.intake_state = IntakeState.INTAKE;
     m_leds.setColor(Color.kYellow);
-  }
-
-  public void goToAmp() {
-    setPivotTarget(PivotTarget.AMP);
-    m_periodicIO.intake_state = IntakeState.NONE;
   }
 
   public void goToStow() {

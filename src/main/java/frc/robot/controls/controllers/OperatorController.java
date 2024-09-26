@@ -30,11 +30,7 @@ public class OperatorController extends FilteredController {
   }
 
   public boolean getWantsIntakeStow() {
-    return this.getButton(Button.kX);
-  }
-
-  public boolean getWantsIntakeAtAmp() {
-    return this.getButton(Button.kY);
+    return this.getButton(Button.kX) || this.getButton(Button.kY);
   }
 
   // D pad
