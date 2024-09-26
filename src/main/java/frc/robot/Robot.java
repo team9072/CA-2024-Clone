@@ -146,9 +146,9 @@ public class Robot extends LoggedRobot {
 
     // Shooter: Hold RightBumper to spin, release to stop.
     // Then, you can easily tap B to score.
-    if (m_operatorController.getButton(Button.kRightBumper)) {
+    if (m_operatorController.getWantsSpinShooter()) {
       // Hold Back to slow down the shooter
-      if (m_operatorController.getButton(Button.kBack)) {
+      if (m_operatorController.getWantsLessSpeed()) {
         speed = 5000;
       } else {
         speed = 10000;
@@ -163,13 +163,13 @@ public class Robot extends LoggedRobot {
     // A to go down and intake, beam break detects and goes up, right trigger to spin shooter, B to launch
 
     // Intake commands
-    if (m_operatorController.getButton(Button.kA)) {
+    if (m_operatorController.getWantsIntakeDown()) {
       m_intake.goToGround();
-    } else if (m_operatorController.getButton(Button.kB)) {
+    } else if (m_operatorController.getWantsIntakeEject()) {
       m_intake.eject();
-    } else if (m_operatorController.getButton(Button.kX)) {
-      m_intake.goToSource();
-    } else if (m_operatorController.getButton(Button.kY)) {
+    } else if (m_operatorController.getWantsIntakeAtAmp()) {
+      m_intake.goToAmp();
+    } else if (m_operatorController.getWantsIntakeStow()) {
       m_intake.goToStow();
     } else if (m_intake.getIntakeState() != IntakeState.INTAKE) {
       m_intake.stopIntake();

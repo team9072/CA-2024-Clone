@@ -13,16 +13,28 @@ public class OperatorController extends FilteredController {
   }
 
   // Buttons
-  public boolean getWantsMoreSpeed() {
+  public boolean getWantsSpinShooter() {
     return this.getButtonPressed(Button.kRightBumper);
   }
 
   public boolean getWantsLessSpeed() {
-    return false;
+    return this.getButtonPressed(Button.kBack);
   }
 
-  public boolean getWantsShooterStop() {
-    return this.getButtonPressed(Button.kLeftBumper);
+  public boolean getWantsIntakeDown() {
+    return this.getButton(Button.kA);
+  }
+
+  public boolean getWantsIntakeEject() {
+    return this.getButton(Button.kB);
+  }
+
+  public boolean getWantsIntakeStow() {
+    return this.getButton(Button.kX);
+  }
+
+  public boolean getWantsIntakeAtAmp() {
+    return this.getButton(Button.kY);
   }
 
   // D pad
