@@ -1,12 +1,9 @@
 package frc.robot.subsystems;
 
-import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
 
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import frc.robot.Constants;
 
 public class Shooter extends Subsystem {
@@ -25,13 +22,8 @@ public class Shooter extends Subsystem {
   private CANSparkFlex mLeftShooterMotor;
   private CANSparkFlex mRightShooterMotor;
 
-  private SparkPIDController mLeftShooterPID;
-  private SparkPIDController mRightShooterPID;
-
   private RelativeEncoder mLeftShooterEncoder;
   private RelativeEncoder mRightShooterEncoder;
-
-  private SlewRateLimiter mSpeedLimiter = new SlewRateLimiter(1000);
 
   private Shooter() {
     super("Shooter");

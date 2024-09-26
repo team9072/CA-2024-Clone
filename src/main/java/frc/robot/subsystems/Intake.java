@@ -14,9 +14,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
-import frc.robot.subsystems.leds.LEDs;
 
 public class Intake extends Subsystem {
   private static final double k_pivotMotorP = 4;
@@ -47,8 +45,6 @@ public class Intake extends Subsystem {
 
 
   private final DigitalInput m_NoteDetectionBeamBreak = new DigitalInput(Constants.Intake.k_beamBreakDioId);
-
-  public final LEDs m_leds = LEDs.getInstance();
 
   /*-------------------------------- Private instance variables ---------------------------------*/
   private static Intake mInstance;
@@ -255,7 +251,6 @@ public class Intake extends Subsystem {
   public void goToGround() {
     setPivotTarget(PivotTarget.GROUND);
     m_periodicIO.intake_state = IntakeState.INTAKE;
-    m_leds.setColor(Color.kYellow);
   }
 
   public void goToStow() {
@@ -299,15 +294,10 @@ public class Intake extends Subsystem {
     if (m_periodicIO.pivot_target == PivotTarget.GROUND && getIntakeHasNote() && atTarget()) {
       setPivotTarget(PivotTarget.STOW);
       m_periodicIO.intake_state = IntakeState.NONE;
-      m_leds.setColor(Color.kGreen);
     }
   }
 
   private boolean atTarget() {
     return m_pivotController.atGoal();
-  }
-
-  private boolean atSetpoint() {
-    return m_pivotController.atSetpoint();
   }
 }

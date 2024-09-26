@@ -13,9 +13,6 @@ public class DriverController extends FilteredController {
     super(port, useDeadband, useSquaredInput);
   }
 
-  // Axis
-  private final double k_triggerActivationThreshold = 0.5;
-
   public double getForwardAxis() {
     return -this.getFilteredAxis(Axis.kLeftY);
   }

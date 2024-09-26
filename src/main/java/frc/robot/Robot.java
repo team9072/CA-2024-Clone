@@ -11,14 +11,10 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.RobotConstants;
 import frc.robot.autonomous.AutoChooser;
 import frc.robot.autonomous.AutoRunner;
@@ -32,7 +28,6 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Subsystem;
-import frc.robot.subsystems.leds.LEDs;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -54,8 +49,6 @@ public class Robot extends LoggedRobot {
   private final Compressor m_compressor = Compressor.getInstance();
   private final Drivetrain m_drive = Drivetrain.getInstance();
   private final Shooter m_shooter = Shooter.getInstance();
-  // private final Climber m_climber = Climber.getInstance();
-  public final LEDs m_leds = LEDs.getInstance();
 
   // Auto stuff
   private Task m_currentTask;
@@ -77,7 +70,6 @@ public class Robot extends LoggedRobot {
     m_allSubsystems.add(m_compressor);
     m_allSubsystems.add(m_drive);
     m_allSubsystems.add(m_shooter);
-    m_allSubsystems.add(m_leds);
 
     // Set up the Field2d object for simulation
     SmartDashboard.putData("Field", m_field);
@@ -133,7 +125,7 @@ public class Robot extends LoggedRobot {
     m_intake.resetPivotMotion();
   }
 
-  double speed = 0;
+  private double m_shooterSpeed = 0;
 
   @Override
   public void teleopPeriodic() {
@@ -149,15 +141,15 @@ public class Robot extends LoggedRobot {
     if (m_operatorController.getWantsSpinShooter()) {
       // Hold Back to slow down the shooter
       if (m_operatorController.getWantsLessSpeed()) {
-        speed = 5000;
+        m_shooterSpeed = 5000;
       } else {
-        speed = 10000;
+        m_shooterSpeed = 10000;
       }
     } else {
-      speed = 0;
+      m_shooterSpeed = 0;
     }
     
-    m_shooter.setSpeed(speed);
+    m_shooter.setSpeed(m_shooterSpeed);
 
     // Scoring process
     // A to go down and intake, beam break detects and goes up, right trigger to spin shooter, B to launch
@@ -176,8 +168,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void disabledInit() {
-    m_leds.rainbow();
-    speed = 0;
+    m_shooterSpeed = 0;
     m_allSubsystems.forEach(subsystem -> subsystem.stop());
   }
 
@@ -196,21 +187,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void testPeriodic() {
-    /*if (sysIdController.getRawButtonPressed(1)) {
-      // A
-      m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward).schedule();
-    } else if (sysIdController.getRawButtonPressed(2)) {
-      // B
-      m_drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse).schedule();
-    } else if (sysIdController.getRawButtonPressed(3)) {
-      // X
-      m_drive.sysIdDynamic(SysIdRoutine.Direction.kForward).schedule();
-    } else if (sysIdController.getRawButtonPressed(4)) {
-      // Y
-      m_drive.sysIdDynamic(SysIdRoutine.Direction.kReverse).schedule();
-    } else if (sysIdController.getRawButtonPressed(8)) {
-      CommandScheduler.getInstance().cancelAll();
-    }*/
+    
   }
 
   @Override
@@ -235,14 +212,6 @@ public class Robot extends LoggedRobot {
       Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
       new PowerDistribution(RobotConstants.kPdhId, ModuleType.kRev); // Enables power distribution logging
     }
-    // else {
-    // setUseTiming(false); // Run as fast as possible
-    // String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from
-    // AdvantageScope (or prompt the user)
-    // Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-    // Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath,
-    // "_sim"))); // Save outputs to a new log
-    // }
 
     Logger.start();
   }
