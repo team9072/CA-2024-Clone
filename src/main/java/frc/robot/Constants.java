@@ -31,8 +31,7 @@ public class Constants {
 
     // Pivot set point angles
     public static final double k_pivotAngleGround = .6;
-    public static final double k_pivotAngleSource = -3;
-    public static final double k_pivotAngleAmp = k_pivotAngleSource;
+    public static final double k_pivotAngleAmp = -1;
     public static final double k_pivotAngleStow = -3;
 
     // Intake speeds

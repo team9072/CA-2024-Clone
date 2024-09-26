@@ -104,7 +104,6 @@ public class Intake extends Subsystem {
   public enum PivotTarget {
     NONE,
     GROUND,
-    SOURCE,
     AMP,
     STOW
   }
@@ -201,8 +200,6 @@ public class Intake extends Subsystem {
     switch (target) {
       case GROUND:
         return Constants.Intake.k_pivotAngleGround;
-      case SOURCE:
-        return Constants.Intake.k_pivotAngleSource;
       case AMP:
         return Constants.Intake.k_pivotAngleAmp;
       case STOW:
@@ -264,13 +261,8 @@ public class Intake extends Subsystem {
     m_leds.setColor(Color.kYellow);
   }
 
-  public void goToSource() {
-    setPivotTarget(PivotTarget.SOURCE);
-    m_periodicIO.intake_state = IntakeState.NONE;
-  }
-
   public void goToAmp() {
-    setPivotTarget(PivotTarget.SOURCE);
+    setPivotTarget(PivotTarget.AMP);
     m_periodicIO.intake_state = IntakeState.NONE;
   }
 
