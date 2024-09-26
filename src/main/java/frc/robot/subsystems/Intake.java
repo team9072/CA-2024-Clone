@@ -287,7 +287,6 @@ public class Intake extends Subsystem {
 
   /*---------------------------------- Custom Private Functions ---------------------------------*/
   private void checkAutoTasks() {
-    SmartDashboard.putNumber("Current", mIntakeMotor.getOutputCurrent());
     // If the intake is set to GROUND, and the intake has a note, and the pivot is
     // close to it's target
     // Stop the intake and go to the SOURCE position
