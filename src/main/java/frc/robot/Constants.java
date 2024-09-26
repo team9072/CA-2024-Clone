@@ -37,7 +37,7 @@ public class Constants {
 
     // Intake speeds
     public static final double k_intakeSpeed = 0.4; // .7
-    public static final double k_ejectSpeed = -1; // -.45
+    public static final double k_ejectSpeed =  -.7;
     public static final double k_feedShooterSpeed = -0.5;
   }
 
