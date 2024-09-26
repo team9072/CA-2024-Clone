@@ -28,47 +28,7 @@ public class DriverController extends FilteredController {
     return -this.getFilteredAxis(Axis.kRightX);
   }
 
-  public boolean getWantsFullIntake() {
-    return this.getButton(Button.kA);
-  }
-
-  public boolean getWantsIntake() {
-    return this.getButton(Button.kRightBumper);
-  }
-
-  public boolean getWantsEject() {
-    return this.getButton(Button.kB);
-  }
-
-  public boolean getWantsSource() {
-    return this.getButton(Button.kX);
-  }
-
-  public boolean getWantsStow() {
-    return this.getButton(Button.kY);
-  }
-
-  public boolean getWantsMoreSpeed() {
-    return this.getHatUp();
-  }
-
-  public boolean getWantsLessSpeed() {
-    return this.getHatLeft() || this.getHatRight();
-  }
-
-  public boolean getWantsShooterStop() {
-    return this.getHatDown();
-  }
-
   public boolean getWantsGyroReset() {
     return this.getButton(Button.kX);
-  }
-
-  public boolean getWantsSpeedMode() {
-    return this.getFilteredAxis(Axis.kLeftTrigger) > k_triggerActivationThreshold;
-  }
-
-  public boolean getWantsSlowMode() {
-    return this.getFilteredAxis(Axis.kRightTrigger) > k_triggerActivationThreshold;
   }
 }
