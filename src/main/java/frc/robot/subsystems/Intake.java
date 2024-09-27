@@ -114,7 +114,8 @@ public class Intake extends Subsystem {
 
   @Override
   public void periodic() {
-    checkAutoTasks();
+    // Beam break just doesn't work reliably
+    // checkAutoTasks();
     pivotPeriodic();
 
     m_periodicIO.intake_speed = intakeStateToSpeed(m_periodicIO.intake_state);
