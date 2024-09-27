@@ -22,7 +22,7 @@ public class DriverController extends FilteredController {
   }
 
   public double getTurnAxis() {
-    return -this.getFilteredAxis(Axis.kRightX);
+    return this.getFilteredAxis(Axis.kRightX);
   }
 
   public boolean getWantsGyroReset() {

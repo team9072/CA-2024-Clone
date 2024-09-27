@@ -11,7 +11,9 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -57,6 +59,14 @@ public class Robot extends LoggedRobot {
 
   // Simulation stuff
   private final Field m_field = Field.getInstance();
+
+  public static Alliance getAlliance() {
+    return DriverStation.getAlliance().orElse(Alliance.Blue);
+  }
+
+  public static boolean isBlueAlliance() {
+    return getAlliance() == Alliance.Blue;
+  }
 
   /**
    * This function is run when the robot is first started up.
@@ -129,7 +139,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    m_drive.drive(-m_driverController.getForwardAxis(), -m_driverController.getLeftAxis(), -m_driverController.getTurnAxis(), true, true);
+    m_drive.drive(m_driverController.getForwardAxis(), m_driverController.getLeftAxis(), m_driverController.getTurnAxis(), true, true);
 
     // X to reset gyro
     if (m_driverController.getWantsGyroReset()) {

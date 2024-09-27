@@ -19,9 +19,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.I2C;
+import frc.robot.Robot;
 import frc.robot.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
 
@@ -85,25 +84,13 @@ public class Drivetrain extends Subsystem {
     // Reset and calibrate
     resetGyro();
     
-    // m_gyro.setAngleAdjustment(180);
     AutoBuilder.configureHolonomic(
         this::getPose, // Robot pose supplier
         this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
         this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
         DriveConstants.AutoPathFollowerConfig,
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
+        () -> !Robot.isBlueAlliance(),
         this // Reference to this subsystem to set requirements
     );
 
@@ -135,8 +122,7 @@ public class Drivetrain extends Subsystem {
    * Reset the forward direction of the robot
    */
   public void resetGyro() {
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-    Pose2d newPose = new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(alliance == Alliance.Blue ? 0 : 180));
+    Pose2d newPose = new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(Robot.isBlueAlliance() ? 0 : 180));
     resetOdometry(newPose);
   }
 
@@ -322,10 +308,6 @@ public class Drivetrain extends Subsystem {
     setModuleStates(swerveModuleStates);
   }
 
-  public void driveDiff(double forwardSpeed, double rotSpeed) {
-    driveRobotRelative(new ChassisSpeeds(forwardSpeed, 0, rotSpeed));
-  }
-
   /**
    * Drive the robot using a robot relative ChasisSpeeds
    * 
@@ -333,7 +315,8 @@ public class Drivetrain extends Subsystem {
    */
   private void driveRobotRelative(ChassisSpeeds speeds) {
     //ChassisSpeeds limitedSpeeds = limitSlewRate(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
-
+    //FIXME: Idk why this works 
+    speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond);
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
