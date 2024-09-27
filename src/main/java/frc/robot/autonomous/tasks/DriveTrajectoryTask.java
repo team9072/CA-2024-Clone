@@ -33,16 +33,16 @@ public class DriveTrajectoryTask extends Task {
   @Override
   public void start() {
     DriverStation.reportWarning("Running path for " + Robot.getAlliance().toString(), false);
-    //TODO: m_pathCommand.initialize();
+    m_pathCommand.initialize();
   }
 
   @Override
   public void update() {
-    /* TODO: m_pathCommand.execute();
+    m_pathCommand.execute();
     if (m_pathCommand.isFinished()) {
       m_pathCommand.end(false);
       m_isFinished = true;
-    }*/
+    }
   }
 
   @Override
