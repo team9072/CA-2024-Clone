@@ -14,11 +14,11 @@ public class OperatorController extends FilteredController {
 
   // Buttons
   public boolean getWantsSpinShooter() {
-    return this.getButtonPressed(Button.kRightBumper);
+    return this.getButton(Button.kRightBumper);
   }
 
   public boolean getWantsLessSpeed() {
-    return this.getButtonPressed(Button.kBack);
+    return this.getButton(Button.kBack);
   }
 
   public boolean getWantsIntakeDown() {
