@@ -68,6 +68,14 @@ public class Robot extends LoggedRobot {
     return getAlliance() == Alliance.Blue;
   }
 
+  public static boolean isRedAlliance() {
+    return getAlliance() == Alliance.Red;
+  }
+
+  public static double invertIfRed(double n) {
+    return n * (isRedAlliance() ? -1 : 1);
+  }
+
   /**
    * This function is run when the robot is first started up.
    */
@@ -139,7 +147,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    m_drive.drive(m_driverController.getForwardAxis(), m_driverController.getLeftAxis(), m_driverController.getTurnAxis(), true, true);
+    m_drive.drive(invertIfRed(m_driverController.getForwardAxis()), invertIfRed(m_driverController.getLeftAxis()), m_driverController.getTurnAxis(), true, true);
 
     // X to reset gyro
     if (m_driverController.getWantsGyroReset()) {

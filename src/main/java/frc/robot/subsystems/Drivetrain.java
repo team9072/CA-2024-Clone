@@ -90,7 +90,7 @@ public class Drivetrain extends Subsystem {
         this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
         this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
         DriveConstants.AutoPathFollowerConfig,
-        () -> !Robot.isBlueAlliance(),
+        Robot::isRedAlliance,
         this // Reference to this subsystem to set requirements
     );
 
@@ -315,8 +315,8 @@ public class Drivetrain extends Subsystem {
    */
   private void driveRobotRelative(ChassisSpeeds speeds) {
     //ChassisSpeeds limitedSpeeds = limitSlewRate(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
-    //FIXME: Idk why this works 
-    speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, -speeds.omegaRadiansPerSecond);
+    
+    speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond);
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(speeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);

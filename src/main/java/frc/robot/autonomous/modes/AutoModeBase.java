@@ -43,7 +43,7 @@ public abstract class AutoModeBase {
         // Set the starting pose to the starting pose of the first DriveTrajectoryTask
         startingPose = ((DriveTrajectoryTask) task).getStartingPose();
 
-        if (!Robot.isBlueAlliance()) {
+        if (Robot.isRedAlliance()) {
           startingPose = GeometryUtil.flipFieldPose(startingPose);
         }
         break;
