@@ -12,21 +12,31 @@ public class SequentialTask extends Task {
     @Override
     public void start() {
         m_index = 0;
-        m_currentTask = k_tasks[m_index];
+        m_currentTask = null;
     }
 
     @Override
     public void update() {
+        if (m_currentTask == null) {
+            if (m_index > k_tasks.length) return;
+
+            m_currentTask = k_tasks[m_index];
+            m_currentTask.start();
+        }
+
         m_currentTask.update();
         if (m_currentTask.isFinished()) {
             m_currentTask.done();
+            
+            m_currentTask = null;
             m_index++;
-            m_currentTask = m_index < k_tasks.length ? k_tasks[m_index] : null;
         }
     }
 
     @Override
     public void updateSim() {
+        if (m_currentTask == null) return;
+
         m_currentTask.updateSim();
     }
 
