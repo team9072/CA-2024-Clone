@@ -141,9 +141,9 @@ public class Robot extends LoggedRobot {
     if (m_operatorController.getWantsSpinShooter()) {
       // Hold Back to slow down the shooter
       if (m_operatorController.getWantsLessSpeed()) {
-        m_shooterSpeed = 5000;
+        m_shooterSpeed = Constants.kShooterSlowSpeed;
       } else {
-        m_shooterSpeed = 10000;
+        m_shooterSpeed = Constants.kShooterSpeed;
       }
     } else {
       m_shooterSpeed = 0;
