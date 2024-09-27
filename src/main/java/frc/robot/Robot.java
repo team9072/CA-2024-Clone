@@ -11,7 +11,9 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -57,6 +59,22 @@ public class Robot extends LoggedRobot {
 
   // Simulation stuff
   private final Field m_field = Field.getInstance();
+
+  public static Alliance getAlliance() {
+    return DriverStation.getAlliance().orElse(Alliance.Blue);
+  }
+
+  public static boolean isBlueAlliance() {
+    return getAlliance() == Alliance.Blue;
+  }
+
+  public static boolean isRedAlliance() {
+    return getAlliance() == Alliance.Red;
+  }
+
+  public static double invertIfRed(double n) {
+    return n * (isRedAlliance() ? -1 : 1);
+  }
 
   /**
    * This function is run when the robot is first started up.
@@ -129,7 +147,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopPeriodic() {
-    m_drive.drive(-m_driverController.getForwardAxis(), -m_driverController.getLeftAxis(), -m_driverController.getTurnAxis(), true, true);
+    m_drive.drive(invertIfRed(m_driverController.getForwardAxis()), invertIfRed(m_driverController.getLeftAxis()), m_driverController.getTurnAxis(), true, true);
 
     // X to reset gyro
     if (m_driverController.getWantsGyroReset()) {
@@ -141,9 +159,9 @@ public class Robot extends LoggedRobot {
     if (m_operatorController.getWantsSpinShooter()) {
       // Hold Back to slow down the shooter
       if (m_operatorController.getWantsLessSpeed()) {
-        m_shooterSpeed = 5000;
+        m_shooterSpeed = Constants.kShooterSlowSpeed;
       } else {
-        m_shooterSpeed = 10000;
+        m_shooterSpeed = Constants.kShooterSpeed;
       }
     } else {
       m_shooterSpeed = 0;

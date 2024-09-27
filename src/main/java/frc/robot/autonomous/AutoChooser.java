@@ -11,12 +11,11 @@ public class AutoChooser {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   public AutoChooser() {
-    m_chooser.setDefaultOption("PP_TEST_MODE", "PP_TEST_MODE");
-    // m_chooser.setDefaultOption("DEFAULT", "DEFAULT");
+    m_chooser.setDefaultOption(AutoMode.SHOOT_ONLY.modeName, AutoMode.SHOOT_ONLY.name());
 
     // Populate the chooser with all the available autos
     for (AutoMode mode : AutoRunner.AutoMode.values()) {
-      m_chooser.addOption(mode.name(), mode.name());
+      m_chooser.addOption(mode.modeName, mode.name());
     }
 
     SmartDashboard.putData("Auto picker", m_chooser);

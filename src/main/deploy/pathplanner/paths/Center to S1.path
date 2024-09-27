@@ -3,36 +3,36 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 13.738370069332733,
-        "y": 2.028035894034751
+        "x": 1.336590141851963,
+        "y": 5.54487565115481
       },
       "prevControl": null,
       "nextControl": {
-        "x": 13.295463433010037,
-        "y": 1.5316265596769396
+        "x": 1.3057281252407118,
+        "y": 6.974815754142787
       },
       "isLocked": false,
-      "linkedName": "SubLeftNote"
+      "linkedName": "Sub Center"
     },
     {
       "anchor": {
-        "x": 15.190911955897986,
-        "y": 5.539196629319185
+        "x": 2.6739441950061846,
+        "y": 7.005677770754038
       },
       "prevControl": {
-        "x": 15.948241726163545,
-        "y": 5.539196629319185
+        "x": 1.3777394973336319,
+        "y": 7.077689142846958
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "BlueSubStart"
+      "linkedName": "S1"
     }
   ],
   "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 4.0,
     "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -43,7 +43,10 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
-  "previewStartingState": null,
+  "folder": "S1 Two Pieces",
+  "previewStartingState": {
+    "rotation": 0,
+    "velocity": 0
+  },
   "useDefaultConstraints": true
 }

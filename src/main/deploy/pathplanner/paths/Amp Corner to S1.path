@@ -3,36 +3,42 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 15.190911955897986,
-        "y": 5.539196629319185
+        "x": 0.7090624707492013,
+        "y": 6.666195588027562
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.800911955897986,
-        "y": 5.539196629319185
+        "x": 1.2748661086294608,
+        "y": 7.1908498704215456
       },
       "isLocked": false,
-      "linkedName": "BlueSubStart"
+      "linkedName": "Sub Amp Corner"
     },
     {
       "anchor": {
-        "x": 13.738370069332733,
-        "y": 2.028035894034751
+        "x": 2.6739441950061846,
+        "y": 7.005677770754038
       },
       "prevControl": {
-        "x": 13.369771234912843,
-        "y": 1.43953670777712
+        "x": 1.6739441950061846,
+        "y": 7.005677770754038
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "SubLeftNote"
+      "linkedName": "S1"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 4.0,
     "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -43,7 +49,10 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
-  "previewStartingState": null,
+  "folder": "S1 Two Pieces",
+  "previewStartingState": {
+    "rotation": 61.35238354295927,
+    "velocity": 0
+  },
   "useDefaultConstraints": true
 }

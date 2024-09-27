@@ -13,7 +13,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 
 public class Intake extends Subsystem {
@@ -287,16 +286,10 @@ public class Intake extends Subsystem {
 
   /*---------------------------------- Custom Private Functions ---------------------------------*/
   private void checkAutoTasks() {
-    // If the intake is set to GROUND, and the intake has a note, and the pivot is
-    // close to it's target
-    // Stop the intake and go to the SOURCE position
-    if (m_periodicIO.pivot_target == PivotTarget.GROUND && getIntakeHasNote() && atTarget()) {
-      setPivotTarget(PivotTarget.STOW);
-      m_periodicIO.intake_state = IntakeState.NONE;
+    // If the intake is set to GROUND, and the intake has a note
+    // Stop the intake and go to the STOW position
+    if (m_periodicIO.pivot_target == PivotTarget.GROUND && getIntakeHasNote()) {
+      goToStow();
     }
-  }
-
-  private boolean atTarget() {
-    return m_pivotController.atGoal();
   }
 }

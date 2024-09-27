@@ -3,36 +3,42 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.27,
-        "y": 5.494955267688313
+        "x": 0.6576257764044353,
+        "y": 4.372119019927263
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.611601991566602,
-        "y": 5.494955267688313
+        "x": 0.9868206202577824,
+        "y": 1.501951475080896
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Sub Source Corner"
     },
     {
       "anchor": {
-        "x": 2.822393084600984,
-        "y": 5.494955267688313
+        "x": 3.2088858162678733,
+        "y": 1.0493085647825435
       },
       "prevControl": {
-        "x": 2.002731130930023,
-        "y": 5.494955267688313
+        "x": 1.4188888528152999,
+        "y": 1.080170581393795
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": 0,
+      "rotateFast": false
+    }
+  ],
   "constraintZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
+    "maxVelocity": 4.0,
     "maxAcceleration": 1.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0
@@ -44,6 +50,9 @@
   },
   "reversed": false,
   "folder": null,
-  "previewStartingState": null,
+  "previewStartingState": {
+    "rotation": -59.64737527236301,
+    "velocity": 0
+  },
   "useDefaultConstraints": true
 }
