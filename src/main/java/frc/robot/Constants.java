@@ -214,7 +214,6 @@ public class Constants {
     public static final double k_width = Units.feetToMeters(54.0);
     public static final double k_length = Units.feetToMeters(27.0);
 
-    // TODO: Add left and right subwoofer starting poses
     public static final Pose2d redCenterPose2d = new Pose2d(15.19, 5.50, new Rotation2d(Units.degreesToRadians(180.0)));
     public static final Pose2d blueCenterPose2d = new Pose2d(1.27, 5.50, new Rotation2d(0));
   }
