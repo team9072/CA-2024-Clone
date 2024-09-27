@@ -2,7 +2,7 @@ package frc.robot.autonomous.modes;
 
 import frc.robot.autonomous.tasks.DriveTrajectoryTask;
 
-public class ShootThenDriveMode extends ShootPreloadedMode {
+public class ShootThenDriveMode extends AutoModeBase {
     private final String m_pathName;
 
     public ShootThenDriveMode(String pathName) {
@@ -11,7 +11,7 @@ public class ShootThenDriveMode extends ShootPreloadedMode {
     
     @Override
     public void queueTasks() {
-        //TODO: Uncomment queueShooterTask();
+        queueTask(shooterSequence());
         queueTask(new DriveTrajectoryTask(m_pathName));
     }
 }

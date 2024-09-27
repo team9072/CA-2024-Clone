@@ -3,35 +3,35 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.6576257764044353,
-        "y": 4.372119019927263
+        "x": 2.6739441950061846,
+        "y": 7.005677770754038
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.9868206202577824,
-        "y": 1.501951475080896
+        "x": 2.0567038627811596,
+        "y": 6.974815754142787
       },
       "isLocked": false,
-      "linkedName": "Sub Source Corner"
+      "linkedName": "S1"
     },
     {
       "anchor": {
-        "x": 2.4064733843753405,
-        "y": 1.0390212259121272
+        "x": 0.7090624707492013,
+        "y": 6.666195588027562
       },
       "prevControl": {
-        "x": 1.4064733843753405,
-        "y": 1.0390212259121272
+        "x": 1.3777394973336319,
+        "y": 7.2217118870327965
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Sub Amp Corner"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 0,
+      "waypointRelativePos": 0.75,
+      "rotationDegrees": 62.17,
       "rotateFast": false
     }
   ],
@@ -45,13 +45,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 62.17,
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "S1 Two Pieces",
   "previewStartingState": {
-    "rotation": -59.64737527236301,
+    "rotation": 0,
     "velocity": 0
   },
   "useDefaultConstraints": true

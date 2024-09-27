@@ -8,40 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.7810738428348016,
-        "y": 7.149700514934453
+        "x": 1.2748661086294608,
+        "y": 7.1908498704215456
       },
       "isLocked": false,
       "linkedName": "Sub Amp Corner"
     },
     {
       "anchor": {
-        "x": 1.8715317631063328,
-        "y": 7.725791491680521
+        "x": 2.6739441950061846,
+        "y": 7.005677770754038
       },
       "prevControl": {
-        "x": 1.1308433644436215,
-        "y": 7.684642136201566
-      },
-      "nextControl": {
-        "x": 2.1199662045490397,
-        "y": 7.739593405093231
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 4.474228497329175,
-        "y": 7.725791491680521
-      },
-      "prevControl": {
-        "x": 2.8694036335441098,
-        "y": 7.736078830553651
+        "x": 1.6739441950061846,
+        "y": 7.005677770754038
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "S1"
     }
   ],
   "rotationTargets": [
@@ -65,9 +49,9 @@
     "rotateFast": false
   },
   "reversed": false,
-  "folder": null,
+  "folder": "S1 Two Pieces",
   "previewStartingState": {
-    "rotation": 60.42216131873868,
+    "rotation": 61.35238354295927,
     "velocity": 0
   },
   "useDefaultConstraints": true

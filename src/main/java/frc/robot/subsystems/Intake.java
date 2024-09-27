@@ -286,16 +286,11 @@ public class Intake extends Subsystem {
 
   /*---------------------------------- Custom Private Functions ---------------------------------*/
   private void checkAutoTasks() {
-    // If the intake is set to GROUND, and the intake has a note, and the pivot is
-    // close to it's target
-    // Stop the intake and go to the SOURCE position
-    if (m_periodicIO.pivot_target == PivotTarget.GROUND && getIntakeHasNote() && atTarget()) {
+    // If the intake is set to GROUND, and the intake has a note
+    // Stop the intake and go to the STOW position
+    if (m_periodicIO.pivot_target == PivotTarget.GROUND && getIntakeHasNote()) {
       setPivotTarget(PivotTarget.STOW);
       m_periodicIO.intake_state = IntakeState.NONE;
     }
-  }
-
-  private boolean atTarget() {
-    return m_pivotController.atGoal();
   }
 }
