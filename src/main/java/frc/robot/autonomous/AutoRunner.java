@@ -23,7 +23,7 @@ public class AutoRunner {
     DO_NOTHING("Do Nothing", () -> new DoNothingMode()),
     SHOOT_ONLY("Shoot Only", () -> new ShootPreloadedMode()),
     SHOOT_AMP_CORNER("Shoot & Leave (Amp Side)", () -> new ShootThenDriveMode("Amp Corner & Leave")),
-    SHOOT_SOURCE_CORNER("Shoot & Leave (Source Side)", () -> new ShootThenDriveMode("Source Corner & Leave test"));
+    SHOOT_SOURCE_CORNER("Shoot & Leave (Source Side)", () -> new ShootThenDriveMode("Source Corner & Leave"));
     
     public final String modeName;
     public final Supplier<AutoModeBase> autoMode;
