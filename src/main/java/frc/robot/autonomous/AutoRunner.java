@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import frc.robot.autonomous.modes.AutoModeBase;
 import frc.robot.autonomous.modes.DoNothingMode;
+import frc.robot.autonomous.modes.IntakeTestMode;
 import frc.robot.autonomous.modes.ShootPreloadedMode;
 import frc.robot.autonomous.modes.ShootThenDriveMode;
 import frc.robot.autonomous.tasks.Task;
@@ -21,6 +22,7 @@ public class AutoRunner {
 
   public enum AutoMode {
     DO_NOTHING("Do Nothing", () -> new DoNothingMode()),
+    INTAKE_TEST("Test Intake", () -> new IntakeTestMode()),
     SHOOT_ONLY("Shoot Only", () -> new ShootPreloadedMode()),
     SHOOT_AMP_CORNER("Shoot & Leave (Amp Side)", () -> new ShootThenDriveMode("Amp Corner & Leave")),
     SHOOT_SOURCE_CORNER("Shoot & Leave (Source Side)", () -> new ShootThenDriveMode("Source Corner & Leave"));

@@ -289,8 +289,7 @@ public class Intake extends Subsystem {
     // If the intake is set to GROUND, and the intake has a note
     // Stop the intake and go to the STOW position
     if (m_periodicIO.pivot_target == PivotTarget.GROUND && getIntakeHasNote()) {
-      setPivotTarget(PivotTarget.STOW);
-      m_periodicIO.intake_state = IntakeState.NONE;
+      goToStow();
     }
   }
 }
