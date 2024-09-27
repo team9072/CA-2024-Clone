@@ -7,6 +7,7 @@ import frc.robot.autonomous.modes.DoNothingMode;
 import frc.robot.autonomous.modes.IntakeTestMode;
 import frc.robot.autonomous.modes.ShootPreloadedMode;
 import frc.robot.autonomous.modes.ShootThenDriveMode;
+import frc.robot.autonomous.modes.TwoPieceMode;
 import frc.robot.autonomous.tasks.Task;
 
 public class AutoRunner {
@@ -22,10 +23,11 @@ public class AutoRunner {
 
   public enum AutoMode {
     DO_NOTHING("Do Nothing", () -> new DoNothingMode()),
-    INTAKE_TEST("Test Intake", () -> new IntakeTestMode()),
     SHOOT_ONLY("Shoot Only", () -> new ShootPreloadedMode()),
     SHOOT_AMP_CORNER("Shoot & Leave (Amp Side)", () -> new ShootThenDriveMode("Amp Corner & Leave")),
-    SHOOT_SOURCE_CORNER("Shoot & Leave (Source Side)", () -> new ShootThenDriveMode("Source Corner & Leave"));
+    SHOOT_SOURCE_CORNER("Shoot & Leave (Source Side)", () -> new ShootThenDriveMode("Source Corner & Leave")),
+    TWO_CENTER("Center & Spike 1 Two Piece", () -> new TwoPieceMode("Center to S1", "S1 to Center")),
+    TWO_AMP("Amp Corner & Spike 1 Two Piece", () -> new TwoPieceMode("Amp Corner to S1", "S1 to Amp Corner"));
     
     public final String modeName;
     public final Supplier<AutoModeBase> autoMode;
